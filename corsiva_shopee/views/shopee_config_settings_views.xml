@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="shopee_connector_res_config_settings_inherit_form_view" model="ir.ui.view">
+            <field name="name">shopee_connector_res_config_settings_inherit_form_view</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="shopee" string="Shopee" data-key="shopee">
+                        <h2>Configuration</h2>
+                        <div class="row mt16 o_settings_container" name="shopee_connector_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Store</span>
+                                <div class="text-muted">
+                                    Default taxes applied to local transactions
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-1 o_light_label" for="url">Store URL
+                                        </label>
+                                        <field name="url"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-1 o_light_label" for="username">Username
+                                        </label>
+                                        <field name="username"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-1 o_light_label" for="password">Password
+                                        </label>
+                                        <field name="password" password="True"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="action_shopee_connector_config_settings" model="ir.actions.act_window">
+            <field name="name">Shopee Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_id" ref="base.res_config_settings_view_form"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'corsiva_shopee'}</field>
+        </record>
+
+        <menuitem id="shopee_connector_menu_root"
+                  name="Shopee"
+                  sequence="100"/>
+
+        <menuitem id="menu_shopee_connector_configuration"
+                  name="Configuration"
+                  parent="shopee_connector_menu_root"
+                  sequence="100"/>
+
+        <menuitem id="menu_shopee_connector_setting"
+                  name="Settings"
+                  parent="menu_shopee_connector_configuration"
+                  action="action_shopee_connector_config_settings"
+                  sequence="100"/>
+
+    </data>
+</odoo>

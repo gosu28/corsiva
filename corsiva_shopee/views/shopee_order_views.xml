@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_shopee_orders" model="ir.actions.act_window">
+            <field name="name">Shopee Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_shopee_order', '=', True)]</field>
+        </record>
+
+        <menuitem id="menu_shopee_orders"
+                  name="Orders"
+                  parent="shopee_connector_menu_root"
+                  action="action_shopee_orders"
+                  sequence="10"/>
+
+    </data>
+</odoo>

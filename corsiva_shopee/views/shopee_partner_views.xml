@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_shopee_customer" model="ir.actions.act_window">
+            <field name="name">Customer</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_shopee_partner', '=', True)]</field>
+        </record>
+
+        <menuitem id="menu_shopee_customers"
+                  name="Customers"
+                  parent="shopee_connector_menu_root"
+                  action="action_shopee_customer"
+                  sequence="15"/>
+
+    </data>
+</odoo>
