@@ -8,6 +8,7 @@
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('is_shopee_partner', '=', True)]</field>
+            <field name="context">{'create': False}</field>
         </record>
 
         <menuitem id="menu_shopee_customers"
