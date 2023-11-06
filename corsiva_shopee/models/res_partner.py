@@ -8,6 +8,7 @@ class ResPartner(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        for vals in vals_list:
-            vals['is_shopee_partner'] = True
+        if self._context.get('create_from_shopee', False):
+            for vals in vals_list:
+                vals['is_shopee_partner'] = True
         return super().create(vals_list)
