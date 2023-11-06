@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//div[hasclass('settings')]" position="inside">
-                    <div class="app_settings_block" data-string="shopee" string="Shopee" data-key="shopee">
+                    <div class="app_settings_block" data-string="corsiva_shopee" string="Shopee" data-key="corsiva_shopee">
                         <h2>Configuration</h2>
                         <div class="row mt16 o_settings_container" name="shopee_connector_setting">
                             <div class="o_setting_right_pane">
@@ -54,6 +54,7 @@
 
         <menuitem id="shopee_connector_menu_root"
                   name="Shopee"
+                  web_icon="corsiva_shopee,static/description/icon.png"
                   sequence="100"/>
 
         <menuitem id="menu_shopee_connector_configuration"
