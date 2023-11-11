@@ -5,6 +5,11 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     is_shopee_product = fields.Boolean()
+    image_ids = fields.One2many(
+        'ir.attachment',
+        'shopee_product_id',
+        'Images'
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
