@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 
 from odoo import api, fields, models
-from odoo.addons.corsiva.corsiva_connector.models import common
+from odoo.addons.corsiva_connector.models import common
 
 from odoo.exceptions import ValidationError
 
