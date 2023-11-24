@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_lazada_categories" model="ir.actions.act_window">
+            <field name="name">Lazada Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_lazada', '=', True)]</field>
+            <field name="context">{'default_is_lazada': True}</field>
+        </record>
+
+        <menuitem id="menu_lazada_categories"
+                  name="Product Categories"
+                  parent="menu_lazada_connector_configuration"
+                  action="action_lazada_categories"
+                  sequence="20"/>
+
+    </data>
+</odoo>

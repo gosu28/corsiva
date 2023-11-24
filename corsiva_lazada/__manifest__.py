@@ -19,7 +19,14 @@
         'views/lazada_partner_views.xml',
         'views/lazada_product_views.xml',
         'views/lazada_attachment_views.xml',
+        'views/lazada_product_category_views.xml',
     ],
     'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            'corsiva_lazada/static/src/xml/*.js',
+            'corsiva_lazada/static/src/xml/*.xml',
+        ],
+    },
     'application': True
 }

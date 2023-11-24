@@ -1,15 +1,13 @@
-import hashlib
-import hmac
-import json
-from datetime import datetime
-
-import requests
-
-from odoo import api, fields, models
+from odoo import api, fields, models, tools
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
+    def _category_domain(self):
+        if self.env.context.get('default_is_lazada_product', False):
+            return [('is_leaf', '=', True)]
+        return [('is_lazada', '=', False)]
 
     is_lazada_product = fields.Boolean()
     image_ids = fields.One2many(
@@ -17,103 +15,118 @@ class ProductTemplate(models.Model):
         'lazada_product_id',
         'Images'
     )
+    categ_id = fields.Many2one(
+        'product.category',
+        'Product Category',
+        change_default=True,
+        default=False,
+        domain=_category_domain,
+        group_expand='_read_group_categ_id',
+        required=True
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
-        if self._context.get('create_from_lazada', False):
-            for vals in vals_list:
-                vals['is_lazada_product'] = True
         res = super().create(vals_list)
-        res.create_product()
+        for r in res:
+            if not r.is_lazada_product:
+                continue
+            r.action_push_product_to_shop()
         return res
 
     def write(self, vals):
-        self.create_product()
-        return super().write(vals)
-
-    def create_product(self):
-        connector = self.env['corsiva.connector'].open(connector_type='lazada')
-        # images_data = connector.create_images(action='create_images', data=self.image_ids)
-        category_data = connector.get_categories(action='get_categories')
-        self.convert_raw_data(category_data['data'])
-
-    def flatten_tree_data(self, data, parent_category_id=None, level=0):
-        flattened_data = []
-
-        for item in data:
-            flattened_item = {
-                'category_id': item['category_id'],
-                'name': item.get('name', False),
-                'leaf': item['leaf'],
-                'parent_category_id': parent_category_id,
-                'level': level
-            }
-            flattened_data.append(flattened_item)
-
-            if 'children' in item and item['children']:
-                child_data = self.flatten_tree_data(item['children'], item['category_id'], level + 1)
-                flattened_data.extend(child_data)
-
-        return flattened_data
-
-    def create_categories(self, datas, parent_id=False):
-        values = []
-        for data in datas:
-            if not data['name']:
+        res = super().write(vals)
+        for r in self:
+            if not r.is_lazada_product:
                 continue
-            values.append({
-                'name': data['name'],
-                'lazada_category_id': data['category_id'],
-                'parent_id': parent_id,
-                'is_lazada': True
-            })
-        self.env['product.category'].create(values)
-    
-    def _build_dict_for_child_category(self, category_ids):
-        res = {}
-        for category_id in category_ids:
-            res[category_id.lazada_category_id] = category_id.id
+            r.action_push_product_to_shop()
         return res
 
-    def convert_raw_data(self, data):
-        grouped_data = self.flatten_tree_data(data)
+    def action_push_product_to_shop(self):
+        connector = self.env['corsiva.connector'].open(connector_type='lazada')
+        
+        image_datas = []
+        if self.image_ids:
+            image_datas = self.create_images(connector)
+            
+        # category_data = connector.get_categories(action='get_categories')
+        # self.env['product.category'].convert_raw_data(category_data['data'])
 
-        data_dict = {}
-        parent_list = []
-        max_level = 0
-        for record in grouped_data:
-            level = record['level']
+        # connector.get_seller(action='get_seller')
+        # connector.get_products(action='get_products')
 
-            if level > max_level:
-                max_level = level
+        products_prepare_data = self._prepare_data_to_action_push_product_to_shops()
+        connector.action_push_product_to_shops(action='action_push_product_to_shops', data=products_prepare_data)
+    
+    def create_images(self, connector):
+        img_datas = []
+        for r in self.image_ids:
+            img_prepare_data = self._prepare_data_to_create_images(r)
+            img_data = connector.create_images(action='create_images', data=img_prepare_data)
+            img_datas.append(img_data)
+        return img_datas
 
-            if level == 0:
-                parent_list.append(record)
-                continue
+    def _prepare_data_to_create_images(self, attachment_id):
+        return {
+            'image': attachment_id.raw
+        }
 
-            if level not in data_dict.keys():
-                data_dict[level] = {}
-
-            parent_category_id = record['parent_category_id']
-            if parent_category_id not in data_dict[level].keys():
-                data_dict[level][parent_category_id] = []
-            data_dict[level][parent_category_id].append(record)
-
-        if parent_list:
-            self.create_categories(parent_list)
-
-        for key in data_dict.keys():
-            domain = [('lazada_category_id', 'in', list(data_dict[key].keys()))]
-            parent_category_ids = self.env['product.category'].search(domain)
-            parent_category_dict = self._build_dict_for_child_category(parent_category_ids)
-            for child_key in data_dict[key].keys():
-                try:
-                    self.create_categories(data_dict[key][child_key], parent_id=parent_category_dict.get(str(child_key), False))
-                except Exception as e:
-                    print(child_key)
-                    print(data_dict[key][child_key])
-
-
-
-
-
+    def _prepare_data_to_action_push_product_to_shops(self):
+        return {
+            "Request": {
+                "Product": {
+                    "PrimaryCategory": self.categ_id.lazada_category_id,
+                    "AssociatedSku": "Existing SkuId in seller center",
+                    "Images": {
+                        "Image": []
+                    },
+                    "Attributes": {
+                        "propCascade": {
+                            "26": "120013644:162,100006867:160387"
+                        },
+                        "name": "test 2022 02",
+                        "disableAttributeAutoFill": False,
+                        "description": "TEST",
+                        "brand": "No Brand",
+                        "brand_id": "30768",
+                        "model": "test",
+                        "waterproof": "Waterproof",
+                        "warranty_type": "Local seller warranty",
+                        "warranty": "1 Month",
+                        "short_description": "",
+                        "Hazmat": "None",
+                        "material": "Leather",
+                        "laptop_size": "11 - 12 inches",
+                        "delivery_option_sof": "No",
+                        "gift_wrapping": "Yes",
+                        "name_engravement": "Yes",
+                        "preorder_enable": "Yes",
+                        "preorder_days": "25"
+                    },
+                    "Skus": {
+                        "Sku": [
+                            {
+                                "SellerSku": "test2022 02",
+                                "saleProp": {
+                                    "color_family": "Green",
+                                    "size": "10"
+                                },
+                                "quantity": "3",
+                                "price": "35",
+                                "special_price": "33",
+                                "special_from_date": "2022-06-20 17:18:31",
+                                "special_to_date": "2025-03-15 17:18:31",
+                                "package_height": "10",
+                                "package_length": "10",
+                                "package_width": "10",
+                                "package_weight": "0.5",
+                                "package_content": "laptop bag",
+                                "Images": {
+                                    "Image": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }

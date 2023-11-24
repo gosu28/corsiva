@@ -1,14 +1,13 @@
 import json
-from datetime import datetime
-
 import requests
 
 from odoo import api, fields, models
 from odoo.addons.corsiva_connector.models import common
-
 from odoo.exceptions import ValidationError
+from datetime import datetime
 
-SUCCESS = [200, 201]
+
+SUCCESS_CODE = [200, 201]
 
 
 class CorsivaConnector(models.TransientModel):
@@ -31,7 +30,10 @@ class CorsivaConnector(models.TransientModel):
     APIs = {
         'lazada': {
             'create_images': '/image/upload',
-            'get_categories': '/category/tree/get'
+            'get_categories': '/category/tree/get',
+            'create_products': '/product/create',
+            'get_seller': '/seller/get',
+            'get_products': '/products/get',
         }
     }
 
@@ -61,7 +63,7 @@ class CorsivaConnector(models.TransientModel):
     def get_base_api_url(self):
         return self.env['ir.config_parameter'].sudo().get_param('lazada_url')
 
-    def create_images(self, action, raw_data):
+    def get_common_parameters(self, action, get_access_token=False, get_language_code=False):
         uri = self.APIs[self.connector_type][action]
         url = self.get_base_api_url()
         config_param = self.env['ir.config_parameter'].sudo()
@@ -69,54 +71,83 @@ class CorsivaConnector(models.TransientModel):
         app_key = config_param.get_param('lazada_app_key')
         app_secret = config_param.get_param('lazada_app_secret')
         access_token = config_param.get_param('lazada_access_token')
+        language_code = config_param.get_param('lazada_language_code')
         timestamp = int(datetime.now().timestamp() * 1000)
 
         params = {
-            "app_key": app_key,
+            "app_key": int(app_key),
             "timestamp": timestamp,
-            "access_token": access_token,
             "sign_method": "sha256"
         }
-        files = {
-            "image": open(raw_data._full_path(raw_data.store_fname), 'rb').read()
-        }
+        if get_access_token:
+            params.update(access_token=access_token)
+        if get_language_code:
+            params.update(language_code=language_code)
+
+        return f"{url}{uri}", uri, params, app_secret
+
+    def create_images(self, action, data):
+        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
         sign = common.get_sign(app_secret, uri, params)
         params.update(sign=sign)
 
         try:
-            response = requests.post(url=f"{url}{uri}", params=params, files=files)
-            if response.status_code in SUCCESS:
-                json_data = json.loads(response.text)
-                return json_data
+            response = requests.post(url=url, params=params, files=data)
+            return self.get_result(response)
         except Exception as e:
             raise ValidationError(e.args)
 
     def get_categories(self, action):
-        uri = self.APIs[self.connector_type][action]
-        url = self.get_base_api_url()
-        config_param = self.env['ir.config_parameter'].sudo()
-
-        app_key = config_param.get_param('lazada_app_key')
-        app_secret = config_param.get_param('lazada_app_secret')
-        language_code = config_param.get_param('lazada_language_code')
-        access_token = config_param.get_param('lazada_access_token')
-        timestamp = int(datetime.now().timestamp() * 1000)
-
-        data = {
-            "app_key": app_key,
-            "timestamp": timestamp,
-            # "access_token": access_token,
-            "sign_method": "sha256",
-            "language_code": language_code
-        }
-
-        sign = common.get_sign(app_secret, uri, data)
-        data.update(sign=sign)
+        url, uri, params, app_secret = self.get_common_parameters(action, get_language_code=True)
+        sign = common.get_sign(app_secret, uri, params)
+        params.update(sign=sign)
 
         try:
-            response = requests.get(url=f"{url}{uri}", params=data)
-            if response.status_code in SUCCESS:
-                json_data = json.loads(response.text)
-                return json_data
+            response = requests.get(url=url, params=params)
+            return self.get_result(response)
         except Exception as e:
             raise ValidationError(e.args)
+
+    def get_seller(self, action):
+        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
+        sign = common.get_sign(app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.get(url=url, params=params)
+            return self.get_result(response)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+    def get_products(self, action):
+        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
+        sign = common.get_sign(app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.get(url=url, params=params)
+            return self.get_result(response)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+    def create_products(self, action, data):
+        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
+        params.update(payload=json.dumps(data))
+        sign = common.get_sign(app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.post(url=url, params=params)
+            return self.get_result(response)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+    def get_result(self, response):
+        if response.status_code in SUCCESS_CODE:
+            json_data = json.loads(response.text)
+            if json_data.get('code') == 0:
+                return json_data
+            if json_data.get('code') == 'IllegalAccessToken':
+                raise ValidationError('The specified access token is invalid or expired. Please authorize again!')
+            raise ValidationError(f"Error {json_data.get('code', '')}: {json_data.get('message', '')}")
+        raise ValidationError(response.text)
