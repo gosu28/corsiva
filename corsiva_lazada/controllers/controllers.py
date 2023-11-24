@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from odoo.addons.corsiva.corsiva_connector.models import common
+from odoo.addons.corsiva_connector.models import common
 from odoo import http
 from odoo.http import request
 
