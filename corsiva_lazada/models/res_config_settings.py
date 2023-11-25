@@ -80,10 +80,11 @@ class ResConfigSettings(models.TransientModel):
             'force_auth': True
         }
 
-        auth_url = self.authorization_url
+        auth_url = self.authorization_url + '/oauth/authorize'
         authorization_redirect_url = auth_url + "?" + "&".join([f"{key}={value}" for key, value in data.items()])
 
         return {
             'type': 'ir.actions.act_url',
-            'url': authorization_redirect_url,
+            'target': 'self',
+            'url': authorization_redirect_url
         }

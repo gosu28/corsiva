@@ -29,6 +29,7 @@ class CorsivaConnector(models.TransientModel):
 
     APIs = {
         'lazada': {
+            'create_access_token': '/rest/auth/token/create',
             'create_images': '/image/upload',
             'get_categories': '/category/tree/get',
             'create_products': '/product/create',
@@ -60,35 +61,58 @@ class CorsivaConnector(models.TransientModel):
             })
         return connector
 
-    def get_base_api_url(self):
-        return self.env['ir.config_parameter'].sudo().get_param('lazada_url')
+    def get_base_api_url(self, get_auth_url):
+        return self.authorization_url if get_auth_url else self.url
 
-    def get_common_parameters(self, action, get_access_token=False, get_language_code=False):
+    def get_common_parameters(self, action, get_access_token=False, get_language_code=False, get_auth_url=False):
         uri = self.APIs[self.connector_type][action]
-        url = self.get_base_api_url()
-        config_param = self.env['ir.config_parameter'].sudo()
-
-        app_key = config_param.get_param('lazada_app_key')
-        app_secret = config_param.get_param('lazada_app_secret')
-        access_token = config_param.get_param('lazada_access_token')
-        language_code = config_param.get_param('lazada_language_code')
-        timestamp = int(datetime.now().timestamp() * 1000)
+        url = f"{self.get_base_api_url(get_auth_url)}{uri}"
 
         params = {
-            "app_key": int(app_key),
-            "timestamp": timestamp,
+            "app_key": int(self.app_key),
+            "timestamp": int(datetime.now().timestamp() * 1000),
             "sign_method": "sha256"
         }
         if get_access_token:
+            access_token = self.env['ir.config_parameter'].sudo().get_param('lazada_access_token')
             params.update(access_token=access_token)
         if get_language_code:
-            params.update(language_code=language_code)
+            params.update(language_code=self.language_code)
 
-        return f"{url}{uri}", uri, params, app_secret
+        if '/rest' in uri:
+            uri = uri.replace('/rest', '')
+
+        return url, uri, params
+
+    def get_result(self, response):
+        if response.status_code in SUCCESS_CODE:
+            json_data = json.loads(response.text)
+            if json_data.get('code') == '0':
+                return json_data
+            if json_data.get('code') == 'IllegalAccessToken':
+                raise ValidationError('The specified access token is invalid or expired. Please authorize again!')
+            raise ValidationError(f"Error {json_data.get('code', '')}: {json_data.get('message', '')}")
+        raise ValidationError(response.text)
+
+    def create_access_token(self, action, code):
+        url, uri, params = self.get_common_parameters(action, get_auth_url=True)
+        params.update(
+            code=code,
+            client_secret=self.app_secret,
+            grant_type="authorization_code"
+        )
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.post(url=url, data=params)
+            return self.get_result(response)
+        except Exception as e:
+            raise ValidationError(e.args)
 
     def create_images(self, action, data):
-        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
-        sign = common.get_sign(app_secret, uri, params)
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        sign = common.get_sign(self.app_secret, uri, params)
         params.update(sign=sign)
 
         try:
@@ -98,8 +122,8 @@ class CorsivaConnector(models.TransientModel):
             raise ValidationError(e.args)
 
     def get_categories(self, action):
-        url, uri, params, app_secret = self.get_common_parameters(action, get_language_code=True)
-        sign = common.get_sign(app_secret, uri, params)
+        url, uri, params = self.get_common_parameters(action, get_language_code=True)
+        sign = common.get_sign(self.app_secret, uri, params)
         params.update(sign=sign)
 
         try:
@@ -109,8 +133,8 @@ class CorsivaConnector(models.TransientModel):
             raise ValidationError(e.args)
 
     def get_seller(self, action):
-        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
-        sign = common.get_sign(app_secret, uri, params)
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        sign = common.get_sign(self.app_secret, uri, params)
         params.update(sign=sign)
 
         try:
@@ -120,8 +144,8 @@ class CorsivaConnector(models.TransientModel):
             raise ValidationError(e.args)
 
     def get_products(self, action):
-        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
-        sign = common.get_sign(app_secret, uri, params)
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        sign = common.get_sign(self.app_secret, uri, params)
         params.update(sign=sign)
 
         try:
@@ -131,9 +155,9 @@ class CorsivaConnector(models.TransientModel):
             raise ValidationError(e.args)
 
     def create_products(self, action, data):
-        url, uri, params, app_secret = self.get_common_parameters(action, get_access_token=True)
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
         params.update(payload=json.dumps(data))
-        sign = common.get_sign(app_secret, uri, params)
+        sign = common.get_sign(self.app_secret, uri, params)
         params.update(sign=sign)
 
         try:
@@ -141,13 +165,3 @@ class CorsivaConnector(models.TransientModel):
             return self.get_result(response)
         except Exception as e:
             raise ValidationError(e.args)
-
-    def get_result(self, response):
-        if response.status_code in SUCCESS_CODE:
-            json_data = json.loads(response.text)
-            if json_data.get('code') == 0:
-                return json_data
-            if json_data.get('code') == 'IllegalAccessToken':
-                raise ValidationError('The specified access token is invalid or expired. Please authorize again!')
-            raise ValidationError(f"Error {json_data.get('code', '')}: {json_data.get('message', '')}")
-        raise ValidationError(response.text)
