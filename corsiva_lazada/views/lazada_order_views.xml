@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_lazada_orders" model="ir.actions.act_window">
+            <field name="name">Lazada Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_lazada_order', '=', True)]</field>
+        </record>
+
+        <menuitem id="menu_lazada_orders"
+                  name="Orders"
+                  parent="lazada_connector_menu_root"
+                  action="action_lazada_orders"
+                  sequence="10"/>
+
+    </data>
+</odoo>
