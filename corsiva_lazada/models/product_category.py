@@ -4,9 +4,9 @@ from odoo import api, fields, models
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    lazada_category_id = fields.Char()
+    lazada_category_id = fields.Char(string='Lazada ID')
     is_lazada = fields.Boolean()
-    is_leaf = fields.Boolean()
+    is_leaf = fields.Boolean(string='Leaf Category')
 
     def flatten_tree_data(self, data, parent_category_id=None, level=0):
         flattened_data = []
@@ -32,6 +32,7 @@ class ProductCategory(models.Model):
         for data in datas:
             if not data['name']:
                 continue
+
             values.append({
                 'name': data['name'],
                 'lazada_category_id': data['category_id'],
@@ -41,7 +42,8 @@ class ProductCategory(models.Model):
             })
         self.create(values)
 
-    def _build_dict_for_child_category(self, category_ids):
+    @staticmethod
+    def _build_dict_for_child_category(category_ids):
         res = {}
         for category_id in category_ids:
             res[category_id.lazada_category_id] = category_id.id

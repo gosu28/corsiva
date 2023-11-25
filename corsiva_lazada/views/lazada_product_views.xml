@@ -18,14 +18,13 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='categ_id']" position="attributes">
-<!--                    <attribute name="domain">[('is_leaf', '=', True)]</attribute>-->
                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
                 </xpath>
 
                 <xpath expr="//page[last()]" position="after">
                     <page name="product_images" string="Product Images">
                         <group>
-                            <field name="is_lazada_product" invisible="0"/>
+                            <field name="is_lazada_product" invisible="1"/>
                             <field name="image_ids" mode="kanban" class="o_modules_field" nolabel="1" colspan="2" add-label="Add new image" autofocus="autofocus">
                                 <kanban class="o_modules_kanban">
                                     <field name="id"/>
@@ -50,9 +49,7 @@
                                             <field name="name"/>
                                             <field name="datas" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}" string="Image"/>
                                         </group>
-                                        <group>
-
-                                        </group>
+                                        <group/>
                                     </group>
                                 </form>
                             </field>
