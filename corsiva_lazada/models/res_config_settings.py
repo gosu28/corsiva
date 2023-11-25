@@ -16,6 +16,7 @@ class ResConfigSettings(models.TransientModel):
     country = fields.Selection(string='Region', default='vn',
                                selection=[('vn', 'Vietnam'), ('sg', 'Singapore'), ('ph', 'Philippines'),
                                           ('my', 'Malaysia'), ('th', 'Thailand'), ('id', 'Indonesia')])
+    synced_product_category = fields.Boolean()
 
     @api.onchange('country')
     def _onchange_country(self):
@@ -47,6 +48,7 @@ class ResConfigSettings(models.TransientModel):
             authorization_url=param.get_param('lazada_authorization_url'),
             language_code=param.get_param('lazada_language_code'),
             country=param.get_param('lazada_country'),
+            synced_product_category=param.get_param('lazada_synced_product_category'),
         )
 
         return res
@@ -88,3 +90,11 @@ class ResConfigSettings(models.TransientModel):
             'target': 'self',
             'url': authorization_redirect_url
         }
+
+    def action_synchronize_product_category(self):
+        self.synced_product_category = True
+        self.env['ir.config_parameter'].sudo().set_param('lazada_synced_product_category', self.synced_product_category)
+
+        connector = self.env['corsiva.connector'].open(connector_type='lazada')
+        category_data = connector.get_categories(action='get_categories')
+        return self.env['product.category'].create_correspond_categories(category_data['data'])

@@ -84,7 +84,8 @@ class CorsivaConnector(models.TransientModel):
 
         return url, uri, params
 
-    def get_result(self, response):
+    @staticmethod
+    def get_result(response):
         if response.status_code in SUCCESS_CODE:
             json_data = json.loads(response.text)
             if json_data.get('code') == '0':

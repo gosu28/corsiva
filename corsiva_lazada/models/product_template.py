@@ -48,15 +48,9 @@ class ProductTemplate(models.Model):
         image_datas = []
         if self.image_ids:
             image_datas = self.create_images(connector)
-            
-        # category_data = connector.get_categories(action='get_categories')
-        # self.env['product.category'].convert_raw_data(category_data['data'])
-
-        # connector.get_seller(action='get_seller')
-        # connector.get_products(action='get_products')
 
         products_prepare_data = self._prepare_data_to_action_push_product_to_shops()
-        connector.action_push_product_to_shops(action='action_push_product_to_shops', data=products_prepare_data)
+        connector.action_push_product_to_shops(action='create_products', data=products_prepare_data)
     
     def create_images(self, connector):
         img_datas = []
@@ -66,7 +60,8 @@ class ProductTemplate(models.Model):
             img_datas.append(img_data)
         return img_datas
 
-    def _prepare_data_to_create_images(self, attachment_id):
+    @staticmethod
+    def _prepare_data_to_create_images(attachment_id):
         return {
             'image': attachment_id.raw
         }

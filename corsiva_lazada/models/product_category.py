@@ -47,18 +47,13 @@ class ProductCategory(models.Model):
             res[category_id.lazada_category_id] = category_id.id
         return res
 
-    def convert_raw_data(self, data):
+    def create_correspond_categories(self, data):
         grouped_data = self.flatten_tree_data(data)
 
         data_dict = {}
         parent_list = []
-        max_level = 0
         for record in grouped_data:
             level = record['level']
-
-            if level > max_level:
-                max_level = level
-
             if level == 0:
                 parent_list.append(record)
                 continue
@@ -82,3 +77,5 @@ class ProductCategory(models.Model):
                 if str(child_key) not in list(parent_category_dict.keys()):
                     continue
                 self.create_categories(data_dict[key][child_key], parent_id=parent_category_dict[str(child_key)])
+
+        return True

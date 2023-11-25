@@ -12,42 +12,36 @@
                     <div class="app_settings_block" data-string="corsiva_lazada" string="Lazada" data-key="corsiva_lazada">
                         <h2>Configuration</h2>
                         <div class="row mt16 o_settings_container" name="lazada_connector_setting">
-                            <div class="o_setting_right_pane">
-                                <span class="o_form_label">Store</span>
-                                <div class="text-muted">
-                                    Default taxes applied to local transactions
-                                </div>
-                                <div class="content-group">
+                            <div class="o_setting_box col-12 col-lg-6">
+                                <div class="o_setting_right_pane">
                                     <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="app_key"/>
+                                        <label class="o_form_label col-4 o_light_label" for="app_key"/>
                                         <field name="app_key"/>
                                     </div>
                                     <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="app_secret"/>
+                                        <label class="o_form_label col-4 o_light_label" for="app_secret"/>
                                         <field name="app_secret"/>
                                     </div>
                                     <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="country"/>
-                                        <field name="country"/>
-                                    </div>
-                                    <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="language_code"/>
-                                        <field name="language_code"/>
-                                    </div>
-                                    <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="url"/>
-                                        <field name="url"/>
-                                    </div>
-                                    <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="callback_url"/>
-                                        <field name="callback_url"/>
-                                    </div>
-                                    <div class="row mt16">
-                                        <label class="o_form_label col-2 o_light_label" for="authorization_url"/>
+                                        <label class="o_form_label col-4 o_light_label" for="authorization_url"/>
                                         <field name="authorization_url"/>
                                     </div>
-                                    <br/>
-                                    <div class="row mt16">
+                                    <div class="mt-5" attrs="{'invisible': [('app_secret', '=', False)]}">
+                                        <field name="synced_product_category" invisible="1"/>
+                                        <button name='action_synchronize_product_category'
+                                                icon="fa-arrow-right"
+                                                type="object"
+                                                string="Synchronize Product Categories"
+                                                class="btn-link"
+                                                attrs="{'invisible': [('synced_product_category', '=', True)]}"
+                                                confirm="This will synchronize all category of lazada?"
+                                        />
+                                        <span attrs="{'invisible': [('synced_product_category', '=', False)]}">
+                                            <i class="fa fa-fw fa-check" role="img" style="color:#1e9f75"/>
+                                            <span class="d-none d-md-inline" style="color:gray"> Product Categories Synced</span>
+                                        </span>
+                                    </div>
+                                    <div class="row mt-5">
                                         <div class="col-3">
                                             <button name="action_authorize"
                                                     type="object"
@@ -55,6 +49,26 @@
                                                     class="oe_highlight"
                                             />
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_setting_box col-12 col-lg-6">
+                                <div class="o_setting_right_pane">
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="country"/>
+                                        <field name="country"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="url"/>
+                                        <field name="url"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="callback_url"/>
+                                        <field name="callback_url"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="language_code"/>
+                                        <field name="language_code"/>
                                     </div>
                                 </div>
                             </div>
