@@ -19,7 +19,14 @@ class LazadaControllers(http.Controller):
             data = connector.create_access_token('create_access_token', code)
             self.save_auth_data(data)
 
-        return request.redirect('/web')
+        action_id = request.env['ir.actions.actions'].sudo().search([('name', '=', 'Lazada Settings')]).id
+        menu_id = request.env['ir.ui.menu'].sudo().search([('name', '=', 'Lazada')]).id
+        if action_id and menu_id:
+            url = '/web?db=%s#action=%s&model=res.config.settings&view_type=form&cids=1&menu_id=%s' % (request.env.cr.dbname, action_id, menu_id)
+        else:
+            url = '/web'
+
+        return request.redirect(url)
 
     @staticmethod
     def save_auth_data(data):
