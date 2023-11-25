@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='public']" position="after">
-                    <field name="public_url"/>
+                    <field name="lazada_product_id" invisible="1"/>
                 </xpath>
 
             </field>

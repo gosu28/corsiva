@@ -33,11 +33,11 @@
                                                 type="object"
                                                 string="Synchronize Product Categories"
                                                 class="btn-link"
-                                                attrs="{'invisible': [('synced_product_category', '=', True)]}"
+                                                attrs="{'invisible': [('synced_product_category', '!=', False)]}"
                                                 confirm="This will synchronize all category of lazada?"
                                         />
                                         <span attrs="{'invisible': [('synced_product_category', '=', False)]}">
-                                            <i class="fa fa-fw fa-check" role="img" style="color:#1e9f75"/>
+                                            <i class="fa fa-fw fa-check" role="img" style="color: #1e9f75"/>
                                             <span class="d-none d-md-inline" style="color:gray"> Product Categories Synced</span>
                                         </span>
                                     </div>

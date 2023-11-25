@@ -17,6 +17,7 @@ class ResConfigSettings(models.TransientModel):
                                selection=[('vn', 'Vietnam'), ('sg', 'Singapore'), ('ph', 'Philippines'),
                                           ('my', 'Malaysia'), ('th', 'Thailand'), ('id', 'Indonesia')])
     synced_product_category = fields.Boolean()
+    synced_brand = fields.Boolean()
 
     @api.onchange('country')
     def _onchange_country(self):
@@ -24,13 +25,13 @@ class ResConfigSettings(models.TransientModel):
             self.url = 'https://api.lazada.vn/rest'
         elif self.country == 'sg':
             self.url = 'https://api.lazada.sg/rest'
-        elif self.country == 'sg':
+        elif self.country == 'ph':
             self.url = 'https://api.lazada.com.ph/rest'
-        elif self.country == 'sg':
+        elif self.country == 'my':
             self.url = 'https://api.lazada.com.my/rest'
-        elif self.country == 'sg':
+        elif self.country == 'th':
             self.url = 'https://api.lazada.co.th/rest'
-        elif self.country == 'sg':
+        elif self.country == 'id':
             self.url = 'https://api.lazada.co.id/rest'
         else:
             self.url = False
@@ -49,6 +50,7 @@ class ResConfigSettings(models.TransientModel):
             language_code=param.get_param('lazada_language_code'),
             country=param.get_param('lazada_country'),
             synced_product_category=param.get_param('lazada_synced_product_category'),
+            synced_brand=param.get_param('lazada_synced_brand'),
         )
 
         return res
