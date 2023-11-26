@@ -83,6 +83,7 @@
                         <group>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
+                            <field name="item_id" invisible="1"/>
                             <field name="is_lazada_product" invisible="1"/>
                             <field name="image_ids"
                                    mode="kanban"
