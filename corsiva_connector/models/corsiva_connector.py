@@ -36,6 +36,8 @@ class CorsivaConnector(models.TransientModel):
             'update_products': '/product/update',
             'get_seller': '/seller/get',
             'get_products': '/products/get',
+            'update_quantity': '/product/stock/sellable/update',
+            'update_price': '/product/price_quantity/update',
         }
     }
 
@@ -164,6 +166,32 @@ class CorsivaConnector(models.TransientModel):
         return self.get_result(response)
 
     def update_products(self, action, data):
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        params.update(payload=json.dumps(data))
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.post(url=url, params=params)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+        return self.get_result(response)
+
+    def update_quantity(self, action, data):
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        params.update(payload=json.dumps(data))
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.post(url=url, params=params)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+        return self.get_result(response)
+
+    def update_price(self, action, data):
         url, uri, params = self.get_common_parameters(action, get_access_token=True)
         params.update(payload=json.dumps(data))
         sign = common.get_sign(self.app_secret, uri, params)
