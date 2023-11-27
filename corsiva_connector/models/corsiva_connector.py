@@ -38,6 +38,7 @@ class CorsivaConnector(models.TransientModel):
             'get_products': '/products/get',
             'update_quantity': '/product/stock/sellable/update',
             'update_price': '/product/price_quantity/update',
+            'get_order': '/order/get',
         }
     }
 
@@ -199,6 +200,19 @@ class CorsivaConnector(models.TransientModel):
 
         try:
             response = requests.post(url=url, params=params)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+        return self.get_result(response)
+
+    def get_order(self, action, lazada_order_id):
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        params['order_id'] = lazada_order_id
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.get(url=url, params=params)
         except Exception as e:
             raise ValidationError(e.args)
 
