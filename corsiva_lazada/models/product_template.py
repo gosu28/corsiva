@@ -11,7 +11,7 @@ PRODUCT_FIELD_NEED_UPDATE = [
     'default_code',
     'description',
     'name',
-    'image_ids'
+    'lazada_image_ids'
 ]
 
 
@@ -24,10 +24,10 @@ class ProductTemplate(models.Model):
         return [('is_lazada', '=', False)]
 
     is_lazada_product = fields.Boolean()
-    image_ids = fields.One2many(
+    lazada_image_ids = fields.Many2many(
         'ir.attachment',
-        'lazada_product_id',
-        'Images'
+        'product_template_ir_attachment_rel',
+        string='Upload Images'
     )
     categ_id = fields.Many2one(
         'product.category',
@@ -51,7 +51,7 @@ class ProductTemplate(models.Model):
     sku_id = fields.Char()
     item_id = fields.Char()
 
-    @api.constrains('weight_amount', 'height_amount', 'length_amount', 'width_amount', 'image_ids')
+    @api.constrains('weight_amount', 'height_amount', 'length_amount', 'width_amount', 'lazada_image_ids')
     def _constrains_product_dimensions(self):
         for r in self:
             if not r.is_lazada_product:
@@ -59,7 +59,7 @@ class ProductTemplate(models.Model):
 
             if r.weight_amount == 0 or r.height_amount == 0 or r.length_amount == 0 or r.width_amount == 0:
                 raise ValidationError('Error: You need to set size specifications for this products!')
-            if not r.image_ids:
+            if not r.lazada_image_ids:
                 raise ValidationError('Error: You need to set image for this products!')
 
     @api.model_create_multi
@@ -113,7 +113,7 @@ class ProductTemplate(models.Model):
 
     def create_images(self, connector):
         img_datas = []
-        for r in self.image_ids:
+        for r in self.lazada_image_ids:
             img_prepare_data = self._prepare_data_to_create_images(r)
             img_data = connector.create_images(action='create_images', data=img_prepare_data)
             img_datas.append(img_data['data'])
