@@ -80,47 +80,13 @@
 
                 <xpath expr="//page[last()]" position="after">
                     <page name="product_images" string="Product Images">
-                        <group>
+                        <div>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
                             <field name="item_id" invisible="1"/>
                             <field name="is_lazada_product" invisible="1"/>
-                            <field name="image_ids"
-                                   mode="kanban"
-                                   class="o_modules_field"
-                                   nolabel="1"
-                                   colspan="2"
-                                   add-label="Add new image"
-                                   autofocus="autofocus"
-                                   required="1">
-                                <kanban class="o_modules_kanban">
-                                    <field name="id"/>
-                                    <field name="name"/>
-                                    <field name="datas"/>
-                                    <templates>
-                                    <t t-name="kanban-box">
-                                        <div class="oe_kanban_global_click">
-                                            <div class="o_kanban_image">
-                                                <img alt="Product image" t-att-src="kanban_image('ir.attachment', 'datas', record.id.raw_value)"/>
-                                            </div>
-                                            <div class="oe_kanban_details">
-                                                <div t-if="record.name.raw_value"><t t-esc="record.name.value"/></div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </templates>
-                                </kanban>
-                                <form>
-                                    <group>
-                                        <group>
-                                            <field name="name"/>
-                                            <field name="datas" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}" string="Image"/>
-                                        </group>
-                                        <group/>
-                                    </group>
-                                </form>
-                            </field>
-                        </group>
+                            <field name="lazada_image_ids" widget="many2many_binary" nolabel="1"/>
+                        </div>
                     </page>
                 </xpath>
 
