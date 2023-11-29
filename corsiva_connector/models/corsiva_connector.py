@@ -238,9 +238,16 @@ class CorsivaConnector(models.TransientModel):
             json_data = json.loads(response.text)
             if json_data.get('code') == '0':
                 return json_data
+
             if json_data.get('code') == 'IllegalAccessToken':
                 raise ValidationError('The specified access token is invalid or expired. Please authorize again!')
             if json_data.get('code') == '16':
                 return json_data
-            raise ValidationError(f"Error {json_data.get('code', '')}: {json_data.get('message', '')}")
+            msg = f"{json_data.get('message', '')}"
+            try:
+                detail = json_data['detail'][0]['message']
+                msg += f"\nDetail: {detail}"
+            except Exception as e:
+                pass
+            raise ValidationError(msg)
         raise ValidationError(response.text)
