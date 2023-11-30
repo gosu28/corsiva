@@ -23,6 +23,11 @@
         'views/lazada_product_category_views.xml',
     ],
     'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            'corsiva_lazada/static/src/css/image.css',
+        ]
+    },
     'post_init_hook': '_stock_post_init',
     'application': True
 }
