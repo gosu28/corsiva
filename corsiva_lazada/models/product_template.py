@@ -46,12 +46,6 @@ class ProductTemplate(models.Model):
         group_expand='_read_group_categ_id',
         required=True
     )
-    detailed_type = fields.Selection([
-        ('consu', 'Consumable'),
-        ('service', 'Service')], string='Product Type', default='product', required=True,
-        help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
-             'A consumable product is a product for which stock is not managed.\n'
-             'A service is a non-material product you provide.')
     lazada_synced_ok = fields.Boolean(
         string='Synced to Lazada'
     )
