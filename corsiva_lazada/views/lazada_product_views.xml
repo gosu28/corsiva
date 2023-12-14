@@ -61,6 +61,29 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
+                <xpath expr="//div[hasclass('oe_title')]" position="after">
+                    <div name="options">
+                        <field name="lazada_synced_ok" invisible="1"/>
+                        <span class="d-inline-block" attrs="{'invisible': [('lazada_synced_ok', '=', False)]}">
+                            <i class="fa fa-fw fa-check" role="img" style="color: #1e9f75"/>
+                            <span class="d-none d-md-inline" style="color:gray"> Synced to Lazada</span>
+                        </span>
+                    </div>
+                </xpath>
+
+                <xpath expr="//page[@name='general_information']/group[last()]" position="attributes">
+                    <attribute name="style">display: none</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='general_information']/group[last()]" position="after">
+                    <group string="Description">
+                        <field colspan="2" name="description" nolabel="1" placeholder="This is description about this product."/>
+                    </group>
+                    <group string="Short Description">
+                        <field colspan="2" name="short_description" nolabel="1" placeholder="This is short description about this product."/>
+                    </group>
+                </xpath>
+
             </field>
         </record>
 
@@ -85,9 +108,23 @@
                             <field name="sku_id" invisible="1"/>
                             <field name="item_id" invisible="1"/>
                             <field name="is_lazada_product" invisible="1"/>
-                            <field name="lazada_image_ids" widget="many2many_binary" nolabel="1"/>
+                            <field name="lazada_image_ids" widget="many2many_binary" nolabel="1" class="lazada_img"/>
+                            <field name="lazada_image_kanban_ids" mode="kanban" nolabel="1" class="lazada_kanban_img"/>
                         </div>
                     </page>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="product_template_inherit_tree_view" model="ir.ui.view">
+            <field name="name">product_template_inherit_tree_view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='activity_exception_decoration']" position="after">
+                    <field name="lazada_synced_ok" invisible="not context.get('default_is_lazada_product', False)"/>
                 </xpath>
 
             </field>

@@ -29,6 +29,14 @@ class ProductTemplate(models.Model):
         'product_template_ir_attachment_rel',
         string='Upload Images'
     )
+    lazada_image_kanban_ids = fields.Many2many(
+        'ir.attachment',
+        'product_template_kanban_ir_attachment_rel',
+        compute='_compute_lazada_image_kanban_ids',
+        inverse='_inverse_lazada_image_kanban_ids',
+        ondelete='cascade',
+        store=True
+    )
     categ_id = fields.Many2one(
         'product.category',
         'Product Category',
@@ -38,7 +46,10 @@ class ProductTemplate(models.Model):
         group_expand='_read_group_categ_id',
         required=True
     )
-    weight_amount = fields.Float(default=10)
+    lazada_synced_ok = fields.Boolean(
+        string='Synced to Lazada'
+    )
+    weight_amount = fields.Float(default=0.5)
     weight_uom_name = fields.Char(default='kg', readonly=1)
     height_amount = fields.Float(default=10)
     height_uom_name = fields.Char(default='cm', readonly=1)
@@ -46,10 +57,22 @@ class ProductTemplate(models.Model):
     length_uom_name = fields.Char(default='cm', readonly=1)
     width_amount = fields.Float(default=10)
     width_uom_name = fields.Char(default='cm', readonly=1)
+    short_description = fields.Html(
+        string='Description'
+    )
     # lazada fields
     shop_sku = fields.Char()
     sku_id = fields.Char()
     item_id = fields.Char()
+
+    @api.depends('lazada_image_ids')
+    def _compute_lazada_image_kanban_ids(self):
+        for r in self:
+            r.lazada_image_kanban_ids = r.lazada_image_ids.ids
+
+    def _inverse_lazada_image_kanban_ids(self):
+        for r in self:
+            r.lazada_image_ids = r.lazada_image_kanban_ids.ids
 
     @api.constrains('weight_amount', 'height_amount', 'length_amount', 'width_amount', 'lazada_image_ids')
     def _constrains_product_dimensions(self):
@@ -100,6 +123,7 @@ class ProductTemplate(models.Model):
                 'item_id': response_data['item_id'],
                 'shop_sku': response_data['sku_list'][0]['shop_sku'],
                 'sku_id': response_data['sku_list'][0]['sku_id'],
+                'lazada_synced_ok': True
             })
         elif action == 'update':
             connector.update_products(action='update_products', data=products_prepare_data)
@@ -135,7 +159,8 @@ class ProductTemplate(models.Model):
                     },
                     "Attributes": {
                         "name": self.name,
-                        "short_description": self.description,
+                        "description": self.description or '',
+                        "short_description": self.short_description or '',
                         "brand": "No Brand",
                         "brand_id": "65074"  # fixed id for 'No Brand'
                     },
