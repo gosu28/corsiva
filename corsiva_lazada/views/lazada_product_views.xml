@@ -41,7 +41,7 @@
                     <label for="volume" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
                     <div class="o_row" name="volume" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
                         <field name="volume" class="oe_inline"/>
-                        <field name="volume_uom_name"/>
+                        <field name="volume_uom_name"/>'
                     </div>
                 </xpath>
 

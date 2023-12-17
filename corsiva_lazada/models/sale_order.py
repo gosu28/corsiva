@@ -6,6 +6,18 @@ class SaleOrder(models.Model):
 
     is_lazada_order = fields.Boolean()
     lazada_order = fields.Char('Lazada order', readonly=False)
+    # code_lazada = fields.Char('Lazada order ID', readonly=False)
+    shipping_fee = fields.Monetary(
+        string='Shipping fee',
+        currency_field='currency_id',
+        default=0,
+    )
+
+    discount = fields.Monetary(
+        string='Discount',
+        currency_field='currency_id',
+        default=0,
+    )
 
     @api.model_create_multi
     def create(self, vals_list):

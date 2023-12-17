@@ -2,6 +2,20 @@
 <odoo>
     <data>
 
+         <record id="view_order_inherit_form_view" model="ir.ui.view">
+            <field name="name">view_order_inherit_form_view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tax_totals']" position="before">
+                    <field name="shipping_fee"  colspan="2" readonly="1"/>
+                    <field name="discount"  colspan="2" readonly="1"/>
+                </xpath>
+<!--                                <field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2" readonly="1"/>-->
+
+            </field>
+        </record>
+
         <record id="action_lazada_orders" model="ir.actions.act_window">
             <field name="name">Lazada Orders</field>
             <field name="type">ir.actions.act_window</field>
