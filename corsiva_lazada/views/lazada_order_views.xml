@@ -7,12 +7,19 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+
                 <xpath expr="//field[@name='tax_totals']" position="before">
                     <field name="shipping_fee"  colspan="2" readonly="1"/>
                     <field name="discount"  colspan="2" readonly="1"/>
+                    <field name="totals_value"  colspan="2" readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='tax_totals']" position="attributes">
+                     <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='tax_id']" position="attributes">
+                     <attribute name="invisible">1</attribute>
                 </xpath>
 <!--                                <field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2" readonly="1"/>-->
-
             </field>
         </record>
 

@@ -28,8 +28,8 @@ class LazadaControllers(http.Controller):
 
         return request.redirect(url)
 
-    @http.route('/webhook-lazada', type='http', auth='public', csrf=False, methods=['POST'])
-    def lazada_webhook_handlerl(self, **post):
+    @http.route('/webhook-lazada', type='json', auth='public', csrf=False, methods=['POST'])
+    def lazada_webhook_handler(self, **post):
 
         try:
             data = json.loads(request.httprequest.data)
@@ -41,18 +41,6 @@ class LazadaControllers(http.Controller):
         self.create_order(response_data)
         return http.Response('OK', status=200)
 
-    @http.route('/lazada/webhook', type='json', auth='none', methods=['POST'], csrf=False)
-    def lazada_webhook_handler2(self, **post):
-        try:
-            payload = json.loads(request.httprequest.data)
-            # Process the payload and update your Odoo records accordingly
-            # Example: process_order(payload['order'])
-        except Exception as e:
-            return {'status': 'error', 'message': str(e)}
-
-        return {'status': 'success'}
-
-
     @staticmethod
     def save_auth_data(data):
         config_param = request.env['ir.config_parameter'].sudo()
@@ -61,38 +49,45 @@ class LazadaControllers(http.Controller):
         config_param.set_param('lazada_expires_in', data['expires_in'])
         config_param.set_param('lazada_refresh_expires_in', data['refresh_expires_in'])
 
-    # @staticmethod
-    def order_exits(self, lazada_order):
-        result = request.env['sale.order'].sudo().search([('lazada_order', '=', lazada_order)])
-        if not result:
-            return False
-        return result
-
     def create_order(self, order):
-        print(order)
-        if order['code'] == '0' and self.order_exits(order['data']['order_id']):
+        if order['code'] == '0':
+            orders = []
             for item in order['data']:
-                customer_id = self._create_customer(item['buyer_id'])
+                vals = {}
+                # pending
                 if item['status'] == 'pending':
-                    order = self.get_order(item['order_id'])
+                    order_id = request.env['sale.order'].sudo().search([('lazada_order', '=', item['order_id'])])
                     product = request.env['product.template'].sudo().search([('item_id', '=', item['product_id'])])
-                    sale_order = request.env['sale.order'].sudo().create({
-                        'partner_id': customer_id.id,
-                        'order_line': [(0, 0, {'product_id': product.product_variant_id.id,
-                                               'product_uom_qty': order["items_count"]}
-                                        )
-                                       ],
-                        'is_lazada_order': True,
-                        'lazada_order': item['order_id'],
-                        'shipping_fee': item['shipping_amount'],
-                        'discount': item['voucher_amount'],
+                    if order_id:
+                        if order_id.request_id == order['request_id']:
+                            for order_line in order_id.order_line:
+                                if order_line.product_id.id == product.product_variant_id.id:
+                                    order_line.product_uom_qty = order_line.product_uom_qty + 1
+                                    order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
+                                    order_id.discount = order_id.discount + item['voucher_amount']
+                                else:
+                                    order_id.order_line = [(4, 0, {'product_id': product.product_variant_id.id,
+                                                                   'product_uom_qty': 1})],
+                        else:
+                            continue
 
-                        # 'tax_id': None
-                        # Replace with the actual product ID and quantity
-                    })
-                    sale_order.order_line.tax_id = None
+                    else:
 
-    # @staticmethod
+                        order_id = request.env['sale.order'].sudo().create({
+                            'partner_id': self._create_customer(item['buyer_id']).id,
+                            'order_line': [(0, 0, {'product_id': product.product_variant_id.id,
+                                                   'product_uom_qty': 1})],
+                            'is_lazada_order': True,
+                            'lazada_order': item['order_id'],
+                            'shipping_fee': item['shipping_amount'],
+                            'discount': item['voucher_amount'],
+                            'request_id': order['request_id']
+                        })
+                        orders.append(order_id)
+                    order_id.order_line.tax_id = None
+            for order_id in orders:
+                order_id.action_confirm()
+
     def get_order(self, lazada_order_id):
         try:
             connector = request.env['corsiva.connector'].sudo().open(connector_type='lazada')
