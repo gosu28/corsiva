@@ -7,6 +7,7 @@ from odoo.http import request
 
 import requests
 import json
+import time
 
 
 class LazadaControllers(http.Controller):
@@ -38,7 +39,7 @@ class LazadaControllers(http.Controller):
             response_data = connector.get_order_items(action='get_order_items', lazada_order_id=lazada_order_id)
         except ValueError as e:
             return http.Response('Invalid JSON', status=400)
-        self.create_order(order=response_data, order_id=lazada_order_id)
+        request.env['sale.order'].with_delay().create_order(order=response_data, lazada_order=lazada_order_id)
         return http.Response('OK', status=200)
 
     @staticmethod
@@ -49,32 +50,7 @@ class LazadaControllers(http.Controller):
         config_param.set_param('lazada_expires_in', data['expires_in'])
         config_param.set_param('lazada_refresh_expires_in', data['refresh_expires_in'])
 
-    def create_order(self, order, order_id):
-        if order['code'] == '0':
-            orders = request.env['sale.order'].sudo()
-            check_order = orders.search([('lazada_order', '=', order_id)])
-            if not check_order:
-                order_id = orders.create({
-                    'partner_id': self._create_customer(order['data'][0]['buyer_id']).id,
-                    'is_lazada_order': True,
-                    'lazada_order': order['data'][0]['order_id'],
-                    'request_id': order['request_id']
-                })
-                for item in order['data']:
-                    # pending
-                    if item['status'] == 'pending':
-                        product = request.env['product.template'].sudo().search([('item_id', '=', item['product_id'])])
-                        order_id.order_line = [(0, 0, {'product_id': product.product_variant_id.id})]
-                        for order_line in order_id.order_line:
-                            if order_line.product_id.id == product.product_variant_id.id:
-                                order_line.product_uom_qty = order_line.product_uom_qty + 1
-                                order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
-                                order_id.discount = order_id.discount + item['voucher_amount']
-                            else:
-                                order_id.order_line = [(4, 0, {'product_id': product.product_variant_id.id,
-                                                               'product_uom_qty': 1})],
-                order_id.order_line.tax_id = None
-                order_id.action_confirm()
+    # 450476244569495
 
     def get_order(self, lazada_order_id):
         try:
@@ -88,19 +64,6 @@ class LazadaControllers(http.Controller):
         else:
             return []
 
-    @staticmethod
-    def _create_customer(buyer_id):
-        check_customer = request.env['res.partner'].sudo().search([('name', '=', buyer_id)])
-
-        if check_customer:
-            return check_customer
-        else:
-            vals = {
-                'name': str(buyer_id),
-                'is_company': False
-                }
-            customer_id = request.env['res.partner'].sudo().create(vals)
-            return customer_id
 
 
 # Lazada
