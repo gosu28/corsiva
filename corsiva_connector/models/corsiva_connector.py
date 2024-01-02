@@ -38,6 +38,8 @@ class CorsivaConnector(models.TransientModel):
             'get_products': '/products/get',
             'update_quantity': '/product/stock/sellable/update',
             'update_price': '/product/price_quantity/update',
+            'get_order': '/order/get',
+            'get_order_items': '/order/items/get',
         }
     }
 
@@ -204,6 +206,32 @@ class CorsivaConnector(models.TransientModel):
 
         return self.get_result(response)
 
+    def get_order(self, action, lazada_order_id):
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        params['order_id'] = lazada_order_id
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.get(url=url, params=params)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+        return self.get_result(response)
+
+    def get_order_items(self, action, lazada_order_id):
+        url, uri, params = self.get_common_parameters(action, get_access_token=True)
+        params['order_id'] = lazada_order_id
+        sign = common.get_sign(self.app_secret, uri, params)
+        params.update(sign=sign)
+
+        try:
+            response = requests.get(url=url, params=params)
+        except Exception as e:
+            raise ValidationError(e.args)
+
+        return self.get_result(response)
+
     @staticmethod
     def get_result(response):
         if response.status_code in SUCCESS_CODE:
@@ -213,7 +241,8 @@ class CorsivaConnector(models.TransientModel):
 
             if json_data.get('code') == 'IllegalAccessToken':
                 raise ValidationError('The specified access token is invalid or expired. Please authorize again!')
-
+            if json_data.get('code') == '16':
+                return json_data
             msg = f"{json_data.get('message', '')}"
             try:
                 detail = json_data['detail'][0]['message']
