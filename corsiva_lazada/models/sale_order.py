@@ -67,7 +67,7 @@ class SaleOrder(models.Model):
         if order['code'] == '0':
             orders = self.env['sale.order'].sudo()
             check_order = orders.search([('lazada_order', '=', lazada_order)])
-            if not check_order:
+            if not check_order and order['data'][0]['status'] == 'pending':
                 order_id = orders.create({
                     'partner_id': self._create_customer(order['data'][0]['buyer_id']).id,
                     'is_lazada_order': True,
@@ -77,21 +77,20 @@ class SaleOrder(models.Model):
                 for item in order['data']:
                     # pending
                     # ready_to_ship
-                    if item['status'] == 'ready_to_ship':
-                        product = self.env['product.template'].sudo().search([('item_id', '=', item['product_id'])])
-                        if order_id.order_line:
-                            for order_line in order_id.order_line:
-                                if order_line.product_id.id == product.product_variant_id.id:
-                                    order_line.product_uom_qty = order_line.product_uom_qty + 1
-                                    order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
-                                    order_id.discount = order_id.discount + item['voucher_amount']
-                                else:
-                                    order_id.order_line = [(4, 0, {'product_id': product.product_variant_id.id,
-                                                                   'product_uom_qty': 1})]
-                        else:
-                            order_id.order_line = [(0, 0, {'product_id': product.product_variant_id.id})]
-                            order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
-                            order_id.discount = order_id.discount + item['voucher_amount']
+                    product = self.env['product.template'].sudo().search([('item_id', '=', item['product_id'])])
+                    if order_id.order_line:
+                        for order_line in order_id.order_line:
+                            if order_line.product_id.id == product.product_variant_id.id:
+                                order_line.product_uom_qty = order_line.product_uom_qty + 1
+                                order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
+                                order_id.discount = order_id.discount + item['voucher_amount']
+                            else:
+                                order_id.order_line = [(4, 0, {'product_id': product.product_variant_id.id,
+                                                               'product_uom_qty': 1})]
+                    else:
+                        order_id.order_line = [(0, 0, {'product_id': product.product_variant_id.id})]
+                        order_id.shipping_fee = order_id.shipping_fee + item['shipping_amount']
+                        order_id.discount = order_id.discount + item['voucher_amount']
                 order_id.order_line.tax_id = None
                 order_id.action_confirm()
 
@@ -107,9 +106,3 @@ class SaleOrder(models.Model):
                 }
             customer_id = self.env['res.partner'].sudo().create(vals)
             return customer_id
-
-
-
-
-
-
