@@ -57,9 +57,6 @@ class ProductTemplate(models.Model):
     length_uom_name = fields.Char(default='cm', readonly=1)
     width_amount = fields.Float(default=10)
     width_uom_name = fields.Char(default='cm', readonly=1)
-    short_description = fields.Html(
-        string='Description'
-    )
     # lazada fields
     shop_sku = fields.Char()
     sku_id = fields.Char()
@@ -114,6 +111,9 @@ class ProductTemplate(models.Model):
         return res
 
     def action_push_product_to_shop(self, action):
+        if not self.env['ir.config_parameter'].sudo().get_param('ecommerce_setup_location', False):
+            raise ValidationError('You need to set up warehouses for the E-commerce platforms beforehand !')
+
         connector = self.env['corsiva.connector'].open(connector_type='lazada')
         image_datas = self.create_images(connector)
         products_prepare_data = self.prepare_data_to_push_product(action, image_datas)
