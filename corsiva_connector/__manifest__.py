@@ -7,8 +7,7 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': ['base'],
-    'data': [
-        # 'security/ir.model.access.csv'
-    ],
-    'demo': []
+    'data': [],
+    'demo': [],
+    'application': True
 }

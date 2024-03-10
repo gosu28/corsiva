@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_e_commerce_products" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+<!--            <field name="domain">-->
+<!--                [-->
+<!--                    '|', '|',-->
+<!--                    ('is_lazada_product', '=', True),-->
+<!--                    ('is_shopee_product', '=', True),-->
+<!--                    ('is_woo_product', '=', True)-->
+<!--                ]-->
+<!--            </field>-->
+        </record>
+
+        <record id="product_template_inherit_form_view" model="ir.ui.view">
+            <field name="name">product_template_inherit_form_view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//page[@name='general_information']/group[last()]" position="attributes">
+                    <attribute name="style">display: none</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='general_information']/group[last()]" position="after">
+                    <group string="Description">
+                        <field colspan="2" name="description" nolabel="1" placeholder="This is description about this product."/>
+                    </group>
+                    <group string="Short Description">
+                        <field colspan="2" name="short_description" nolabel="1" placeholder="This is short description about this product."/>
+                    </group>
+                </xpath>
+
+            </field>
+        </record>
+
+        <menuitem id="menu_e_commerce_products"
+                  name="Products"
+                  parent="e_commerce_menu_root"
+                  action="action_e_commerce_products"
+                  sequence="20"/>
+
+    </data>
+</odoo>

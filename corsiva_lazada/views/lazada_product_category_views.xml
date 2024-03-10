@@ -2,22 +2,6 @@
 <odoo>
     <data>
 
-        <record id="action_lazada_categories" model="ir.actions.act_window">
-            <field name="name">Lazada Categories</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">product.category</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('is_lazada', '=', True)]</field>
-            <field name="context">
-                {
-                    'default_is_lazada': True,
-                    'create': 0,
-                    'delete': 0,
-                    'edit': 0
-                }
-            </field>
-        </record>
-
         <record id="lazada_product_category_inherit_tree_view" model="ir.ui.view">
             <field name="name">lazada_product_category_inherit_tree_view</field>
             <field name="model">product.category</field>
@@ -31,12 +15,6 @@
 
             </field>
         </record>
-
-        <menuitem id="menu_lazada_categories"
-                  name="Product Categories"
-                  parent="menu_lazada_connector_configuration"
-                  action="action_lazada_categories"
-                  sequence="20"/>
 
     </data>
 </odoo>
