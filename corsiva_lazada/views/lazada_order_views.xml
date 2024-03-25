@@ -32,8 +32,8 @@
         </record>
 
         <menuitem id="menu_lazada_orders"
-                  name="Orders"
-                  parent="lazada_connector_menu_root"
+                  name="Orders lazada"
+                  parent="corsiva_connector.menu_corsiva_order"
                   action="action_lazada_orders"
                   sequence="10"/>
 

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="lazada_connector_res_config_settings_inherit_form_view" model="ir.ui.view">
+            <field name="name">lazada_connector_res_config_settings_inherit_form_view</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="corsiva_woo" string="Woo" data-key="corsiva_woo">
+                        <h2>Configuration</h2>
+                        <div class="row mt16 o_settings_container" name="woo_connector_setting">
+                            <div class="o_setting_box col-12 col-lg-6">
+                                <div class="o_setting_right_pane">
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="woo_url"/>
+                                        <field name="woo_url"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="woo_consumer_key"/>
+                                        <field name="woo_consumer_key"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="woo_consumer_secret"/>
+                                        <field name="woo_consumer_secret"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="action_woo_connector_config_settings" model="ir.actions.act_window">
+            <field name="name">Woo Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_id" ref="base.res_config_settings_view_form"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'corsiva_woo'}</field>
+        </record>
+
+        <menuitem id="woo_connector_menu_root"
+                  name="Woo"
+                  web_icon="corsiva_woo,static/description/icon.png"
+                  sequence="100"/>
+
+        <menuitem id="menu_lazada_connector_setting"
+                  name="Settings Woo"
+                  parent="corsiva_connector.menu_corsiva_connector_configuration"
+                  action="action_woo_connector_config_settings"
+                  sequence="1"/>
+
+    </data>
+</odoo>

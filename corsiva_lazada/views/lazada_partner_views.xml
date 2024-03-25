@@ -11,8 +11,8 @@
         </record>
 
         <menuitem id="menu_lazada_customers"
-                  name="Customers"
-                  parent="lazada_connector_menu_root"
+                  name="Customers lazada"
+                  parent="corsiva_connector.corsiva_customers_root"
                   action="action_lazada_customer"
                   sequence="15"/>
 

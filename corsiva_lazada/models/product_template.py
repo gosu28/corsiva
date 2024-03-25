@@ -57,9 +57,6 @@ class ProductTemplate(models.Model):
     length_uom_name = fields.Char(default='cm', readonly=1)
     width_amount = fields.Float(default=10)
     width_uom_name = fields.Char(default='cm', readonly=1)
-    short_description = fields.Html(
-        string='Description'
-    )
     # lazada fields
     shop_sku = fields.Char()
     sku_id = fields.Char()

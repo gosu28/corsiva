@@ -71,19 +71,6 @@
                     </div>
                 </xpath>
 
-                <xpath expr="//page[@name='general_information']/group[last()]" position="attributes">
-                    <attribute name="style">display: none</attribute>
-                </xpath>
-
-                <xpath expr="//page[@name='general_information']/group[last()]" position="after">
-                    <group string="Description">
-                        <field colspan="2" name="description" nolabel="1" placeholder="This is description about this product."/>
-                    </group>
-                    <group string="Short Description">
-                        <field colspan="2" name="short_description" nolabel="1" placeholder="This is short description about this product."/>
-                    </group>
-                </xpath>
-
             </field>
         </record>
 
@@ -102,7 +89,7 @@
                 </xpath>
 
                 <xpath expr="//page[last()]" position="after">
-                    <page name="product_images" string="Product Images">
+                    <page name="product_images" string="Product Images Lazada">
                         <div>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
@@ -131,8 +118,8 @@
         </record>
 
         <menuitem id="menu_lazada_products"
-                  name="Products"
-                  parent="lazada_connector_menu_root"
+                  name="Products Lazada"
+                  parent="corsiva_connector.menu_corsiva_products"
                   action="action_lazada_products"
                   sequence="20"/>
 

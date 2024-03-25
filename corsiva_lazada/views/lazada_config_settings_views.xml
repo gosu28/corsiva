@@ -94,14 +94,9 @@
                   web_icon="corsiva_lazada,static/description/icon.png"
                   sequence="100"/>
 
-        <menuitem id="menu_lazada_connector_configuration"
-                  name="Configuration"
-                  parent="lazada_connector_menu_root"
-                  sequence="100"/>
-
         <menuitem id="menu_lazada_connector_setting"
-                  name="Settings"
-                  parent="menu_lazada_connector_configuration"
+                  name="Settings Lazada"
+                  parent="corsiva_connector.menu_corsiva_connector_configuration"
                   action="action_lazada_connector_config_settings"
                   sequence="1"/>
 

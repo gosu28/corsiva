@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_odoo_customer" model="ir.actions.act_window">
+        <field name="name">Customer</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="corsiva_customers_root"
+              name="Customers"
+              parent="corsiva_menu_root"
+              sequence="15"/>
+
+    <menuitem id="odoo_customers_menu"
+              name="Customers"
+              parent="corsiva_customers_root"
+              action="action_odoo_customer"
+              sequence="1"/>
+</odoo>

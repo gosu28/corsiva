@@ -7,11 +7,7 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': [
-        'base',
         'corsiva_connector',
-        'sale_management',
-        'sale_stock',
-        'contacts'
     ],
     'data': [
         'data/stock_location.xml',

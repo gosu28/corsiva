@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_odoo_orders" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_corsiva_order"
+              name="Orders"
+              parent="corsiva_menu_root"
+              sequence="10"/>
+
+    <menuitem id="menu_odoo_order"
+          name="Orders"
+          parent="menu_corsiva_order"
+          action="action_odoo_orders"
+          sequence="1"/>
+</odoo>

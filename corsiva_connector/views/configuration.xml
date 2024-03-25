@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_corsiva_connector_configuration"
+              name="Configuration"
+              parent="corsiva_menu_root"
+              sequence="100"/>
+</odoo>
