@@ -15,8 +15,8 @@
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
             <field name="detailed_type" position="after">
-                <field name="woo_type" readonly="True"/>
-                <field name="woo_status" readonly="True"/>
+                <field name="woo_type"/>
+                <field name="woo_status"/>
                 <field name="is_woo" invisible="1"/>
                 <field name="url_product" readonly="True" attrs="{'invisible': [('is_woo', '=', False)]}"/>
             </field>

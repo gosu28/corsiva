@@ -7,22 +7,27 @@ import pytz
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    def _category_domain(self):
+        if self.env.context.get('default_is_woo_product', False):
+            return [('is_woo', '=', True)]
+        return [('is_woo', '=', False)]
+
     is_woo = fields.Boolean(string="Is Woo", default=False)
     url_product = fields.Char('URL Product Woo')
     woo_sku = fields.Char('SKU WOO', readonly=True)
+    id_woo = fields.Char('id woo', readonly=True)
     woo_type = fields.Selection([
         ('simple', 'Simple Product'),
         ('grouped', 'Grouped Product'),
-        ('virtual', 'Virtual Product'),
-        ('downloadable', 'Downloadable Product'),
-        ('external/affiliate', 'external/affiliate Product'),
-        ('variable product', 'Variable Product'),
+        ('external', 'external/affiliate Product'),
+        ('variable', 'Variable Product'),
         ], string='Product Woo Type', default='simple', required=True)
 
     woo_status = fields.Selection([
         ('publish', 'Published'),
         ('pending', 'Pending Review'),
         ('draft', 'Draft'),
+        ('private ', 'Private'),
         ], string='Product Woo Status', default='publish', required=True)
 
     woo_image_ids = fields.Many2many(
@@ -37,6 +42,16 @@ class ProductTemplate(models.Model):
         inverse='_inverse_woo_image_kanban_ids',
         ondelete='cascade',
         store=True
+    )
+
+    categ_id = fields.Many2one(
+        'product.category',
+        'Product Category',
+        change_default=True,
+        default=False,
+        domain=_category_domain,
+        group_expand='_read_group_categ_id',
+        required=True
     )
 
     @api.depends('lazada_image_ids')
@@ -59,6 +74,11 @@ class ProductTemplate(models.Model):
             r.woo_sku = r.get_sku_woo()
         return res
 
+    def write(self, vals):
+        res = super().write(vals)
+        if self.is_woo:
+            self.action_push_product_to_shop(action="update")
+
     def get_sku_woo(self, timezone='Asia/Kolkata'):
         for res in self:
             format = "%Y%m%d%H%M%S%Z%z"
@@ -74,17 +94,25 @@ class ProductTemplate(models.Model):
             r.action_push_product_to_shop(action="create")
             r.is_woo = True
 
-
     def action_push_product_to_shop(self, action):
         connector = self.env['corsiva.woo'].open(connector_type='woo')
         products_prepare_data = self.prepare_data_to_push_product()
 
         if action == 'create':
             response_data = connector.woo_create_product(data=products_prepare_data)
+            self.with_context(loop=True).write({
+                'id_woo': response_data['id'],
+                "url_product": response_data['permalink']
+            })
         elif action == 'update':
-            connector.update_products(action='update_products', data=products_prepare_data)
-
+            connector.woo_update_product(data=products_prepare_data, id_woo=self.id_woo)
         return True
+
+    def get_categories_id(self):
+        categories = []
+        for res in self:
+            categories.append({"id": self.categ_id.woo_category_id})
+            return categories
 
     def prepare_data_to_push_product(self):
         data = {
@@ -93,7 +121,7 @@ class ProductTemplate(models.Model):
             "regular_price": str(self.list_price) or "",
             "description": self.description or "",
             "short_description": self.short_description or "",
-            "categories": [],
+            "categories": self.get_categories_id(),
             "images": self.get_images_url() or [],
             "status": self.woo_status or "",
             "sku": self.woo_sku or "",

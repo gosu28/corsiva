@@ -33,3 +33,8 @@ class ResConfigSettings(models.TransientModel):
         param.set_param('woo_url', field_woo_url)
         param.set_param('woo_consumer_key', field_woo_consumer_key)
         param.set_param('woo_consumer_secret', field_woo_consumer_secret)
+
+    def action_synchronize_product_category_woo(self):
+        connector = self.env['corsiva.woo'].open(connector_type='woo')
+        category_data = connector.get_categories()
+        return True

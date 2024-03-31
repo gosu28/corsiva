@@ -12,6 +12,7 @@
     'data': [
         'views/config_settings_views.xml',
         'views/woo_product_view.xml',
+        'views/woo_product_category_views.xml',
 
     ],
     'demo': [],

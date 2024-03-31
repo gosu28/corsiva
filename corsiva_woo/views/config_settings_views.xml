@@ -26,6 +26,15 @@
                                         <label class="o_form_label col-4 o_light_label" for="woo_consumer_secret"/>
                                         <field name="woo_consumer_secret"/>
                                     </div>
+                                    <div class="row mt-5">
+                                        <div class="col-5">
+                                            <button name="action_synchronize_product_category_woo"
+                                                    type="object"
+                                                    string="Load Product Categories"
+                                                    class="oe_highlight"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

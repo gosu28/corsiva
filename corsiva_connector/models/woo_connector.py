@@ -26,6 +26,8 @@ class WooConnection(models.TransientModel):
     APIs = {
         'woo': {
             'create_product': '/wp-json/wc/v3/products',
+            'update_product': '/wp-json/wc/v3/products/',
+            'get_category': '/wp-json/wc/v3/products/categories',
         }
     }
 
@@ -66,6 +68,36 @@ class WooConnection(models.TransientModel):
             return ValidationError("No data transmitted !")
         resutl = requests.post(url=URL_create_product, json=data, auth=self._get_auth())
         return self.get_result(resutl)
+
+    def woo_update_product(self, data=None, id_woo=None):
+        if self.woo_url is None:
+            return ValidationError("Please connect to woo in config")
+        URL_create_product = self.woo_url + self.APIs['woo']['update_product'] + id_woo
+        if data is None:
+            return ValidationError("No data transmitted !")
+        resutl = requests.post(url=URL_create_product, json=data, auth=self._get_auth())
+        if "message" in resutl:
+            return ValidationError(resutl["message"])
+        return self.get_result(resutl)
+
+    def get_categories(self):
+        if self.woo_url is None:
+            return ValidationError("Please connect to woo in config")
+        steps = 1
+        while True:
+            URL_create_product = (self.woo_url + self.APIs['woo']['get_category'] +
+                                  "?per_page=100&page={0}".format(steps))
+            response_data = requests.get(url=URL_create_product, auth=self._get_auth())
+            results = self.get_result(response_data)
+            if len(results) == 0:
+                break
+            try:
+                self.env['product.category'].create_correspond_categories(data=results)
+            except Exception as e:
+                raise ValidationError(str(e))
+            steps = steps + 1
+
+
 
     @staticmethod
     def get_result(response):
