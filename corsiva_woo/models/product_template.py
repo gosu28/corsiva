@@ -35,6 +35,7 @@ class ProductTemplate(models.Model):
         'product_template_ir_attachment_rel',
         string='Upload Images'
     )
+    is_manage_stock = fields.Boolean(string='Stock Management', compute='compute_woo_manage_stock', readonly=True)
     woo_image_kanban_ids = fields.Many2many(
         'ir.attachment',
         'product_template_kanban_ir_attachment_rel',
@@ -54,6 +55,15 @@ class ProductTemplate(models.Model):
         required=True
     )
 
+    @api.depends('detailed_type')
+    def compute_woo_manage_stock(self):
+        for res in self:
+            if res.detailed_type == "product":
+                self.is_manage_stock = True
+            else:
+                self.is_manage_stock = False
+
+
     @api.depends('lazada_image_ids')
     def _compute_woo_image_kanban_ids(self):
         for r in self:
@@ -72,7 +82,13 @@ class ProductTemplate(models.Model):
             r.lazada_image_kanban_ids.public_image()
             r.lazada_image_ids.public_image()
             r.woo_sku = r.get_sku_woo()
+            # r.add_locations()
         return res
+
+    # def add_locations(self):
+    #     for res in self:
+    #         location_id = res.env.ref('corsiva_lazada.lazada_stock_location')
+    #         res.location_id = location_id.id
 
     def write(self, vals):
         res = super().write(vals)
@@ -126,6 +142,7 @@ class ProductTemplate(models.Model):
             "status": self.woo_status or "",
             "sku": self.woo_sku or "",
             "weight": str(self.weight_amount) or "",
+            "manage_stock": self.is_manage_stock,
             "dimensions": {
                 "length": str(self.length_amount) or "",
                 "width": str(self.width_amount) or "",

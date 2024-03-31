@@ -17,6 +17,7 @@
             <field name="detailed_type" position="after">
                 <field name="woo_type"/>
                 <field name="woo_status"/>
+                <field name="is_manage_stock"/>
                 <field name="is_woo" invisible="1"/>
                 <field name="url_product" readonly="True" attrs="{'invisible': [('is_woo', '=', False)]}"/>
             </field>
@@ -30,7 +31,8 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='action_update_quantity_on_hand']" position="after">
-                    <button string="Push Woo" type="object"  name="action_create_product_woo"/>
+                    <field name="is_woo" invisible="1"/>
+                    <button string="Push Woo" type="object"  name="action_create_product_woo"  attrs="{'invisible': [('is_woo','=',True)]}"/>
                 </xpath>
 
                 <xpath expr="//field[@name='categ_id']" position="attributes">
