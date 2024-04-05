@@ -5,7 +5,7 @@ class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
     def woo_update_quantity(self):
-        location_id = self.env.ref('corsiva_woo.woo_stock_location')
+        location_id = self.env.ref('corsiva_woo.woo_stock_location=')
         if self.product_id.is_manage_stock and self.location_id == location_id:
             # and self.location_id == location_id:
             connector = self.env['corsiva.woo'].open(connector_type='woo')
