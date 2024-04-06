@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_e_commerce_categories" model="ir.actions.act_window">
+            <field name="name">Product Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.category</field>
+            <field name="view_mode">tree,form</field>
+<!--            <field name="domain">['|', '|', ('is_lazada', '=', True), ('is_shopee', '=', True), ('is_woo', '=', True)]</field>-->
+<!--            <field name="context">-->
+<!--                {-->
+<!--                    'default_is_lazada': True,-->
+<!--                    'create': 0,-->
+<!--                    'delete': 0,-->
+<!--                    'edit': 0-->
+<!--                }-->
+<!--            </field>-->
+        </record>
+
+        <menuitem id="menu_product_categories"
+                  name="Product Categories"
+                  parent="menu_e_commerce_configuration"
+                  action="action_e_commerce_categories"
+                  sequence="20"/>
+
+    </data>
+</odoo>

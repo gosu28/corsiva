@@ -19,5 +19,6 @@
         'views/corsiva_order_view.xml',
         'views/configuration.xml',
     ],
-    'demo': []
+    'demo': [],
+    'application': True
 }

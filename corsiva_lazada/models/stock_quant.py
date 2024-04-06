@@ -5,8 +5,8 @@ class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
     def update_quantity(self):
-        location_id = self.env.ref('corsiva_lazada.lazada_stock_location')
-        if self.product_id.sku_id and self.location_id == location_id:
+        location_id = self.env['stock.location'].browse(int(self.env['ir.config_parameter'].sudo().get_param('lazada_stock')))
+        if location_id and self.product_id.sku_id and self.location_id == location_id:
             connector = self.env['corsiva.connector'].open(connector_type='lazada')
             data = self._prepare_data_to_update_quantity()
             connector.update_quantity('update_quantity', data=data)

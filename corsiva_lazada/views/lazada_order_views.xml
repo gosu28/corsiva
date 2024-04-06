@@ -36,6 +36,5 @@
                   parent="corsiva_connector.menu_corsiva_order"
                   action="action_lazada_orders"
                   sequence="10"/>
-
     </data>
 </odoo>

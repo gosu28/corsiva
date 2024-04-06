@@ -8,12 +8,11 @@
     'version': '16.0.0.0',
     'depends': [
         'corsiva_connector',
+        'corsiva_setup',
     ],
     'data': [
-        'data/stock_location.xml',
         'views/lazada_config_settings_views.xml',
         'views/lazada_order_views.xml',
-        'views/lazada_partner_views.xml',
         'views/lazada_product_views.xml',
         'views/lazada_attachment_views.xml',
         'views/lazada_product_category_views.xml',
@@ -24,6 +23,5 @@
             'corsiva_lazada/static/src/css/image.css',
         ]
     },
-    'post_init_hook': '_stock_post_init',
     'application': True
 }

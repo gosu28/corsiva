@@ -46,8 +46,8 @@
                 <xpath expr="//page[last()]" position="after">
                     <page name="product_images" string="Product Images Woo">
                         <div>
-                            <field name="lazada_image_ids" widget="many2many_binary" nolabel="1" class="lazada_img"/>
-                            <field name="lazada_image_kanban_ids" mode="kanban" nolabel="1" class="lazada_kanban_img"/>
+                            <field name="woo_image_ids" widget="many2many_binary" nolabel="1" class="woo_img"/>
+                            <field name="woo_image_kanban_ids" mode="kanban" nolabel="1" class="woo_kanban_img"/>
                         </div>
                     </page>
                 </xpath>
@@ -55,9 +55,9 @@
             </field>
         </record>
 
-    <menuitem id="menu_woo_products"
-              name="Products Woo"
-              parent="corsiva_connector.menu_corsiva_products"
-              action="action_odoo_products"
-              sequence="10"/>
+<!--    <menuitem id="menu_woo_products"-->
+<!--              name="Products Woo"-->
+<!--              parent="corsiva_connector.menu_corsiva_products"-->
+<!--              action="action_odoo_products"-->
+<!--              sequence="10"/>-->
 </odoo>

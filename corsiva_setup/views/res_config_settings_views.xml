@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="setup_location_res_config_settings_inherit_form_view" model="ir.ui.view">
+            <field name="name">setup_location_res_config_settings_inherit_form_view</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[@id='categorize_locations']" position="after">
+                    <field name="setup_once_time" invisible="1"/>
+                    <div class="col-12 col-lg-12 o_setting_box" id="ecommerce_setup_location">
+                        <div class="o_setting_left_pane">
+                            <field name="ecommerce_setup_location"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="ecommerce_setup_location"/>
+                            <div class="text-muted">
+                                Setup location in your warehouse
+                            </div>
+                            <div class="content-group">
+                                <div class="ml-3 mt8" attrs="{'invisible': [('ecommerce_setup_location', '=', False)]}">
+                                    <field name="location_setting"
+                                           widget="radio"
+                                           attrs="{'required': [('ecommerce_setup_location', '!=', False)]}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="action_e_commerce_config_settings" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_id" ref="base.res_config_settings_view_form"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'corsiva_lazada'}</field>
+        </record>
+
+        <menuitem id="e_commerce_menu_root"
+                  name="E-commerce"
+                  web_icon="corsiva_setup,static/description/icon.png"
+                  sequence="100"/>
+
+        <menuitem id="menu_e_commerce_configuration"
+                  name="Configuration"
+                  parent="e_commerce_menu_root"
+                  sequence="25"/>
+
+        <menuitem id="menu_e_commerce_setting"
+                  name="Settings"
+                  parent="menu_e_commerce_configuration"
+                  action="action_e_commerce_config_settings"
+                  sequence="1"/>
+
+    </data>
+</odoo>

@@ -10,7 +10,7 @@
 
                 <xpath expr="//div[hasclass('settings')]" position="inside">
                     <div class="app_settings_block" data-string="corsiva_lazada" string="Lazada" data-key="corsiva_lazada">
-                        <h2>Configuration</h2>
+                        <h2>Lazada Configuration</h2>
                         <div class="row mt16 o_settings_container" name="lazada_connector_setting">
                             <div class="o_setting_box col-12 col-lg-6">
                                 <div class="o_setting_right_pane">
@@ -78,7 +78,6 @@
 
             </field>
         </record>
-
         <record id="action_lazada_connector_config_settings" model="ir.actions.act_window">
             <field name="name">Lazada Settings</field>
             <field name="type">ir.actions.act_window</field>
@@ -99,6 +98,5 @@
                   parent="corsiva_connector.menu_corsiva_connector_configuration"
                   action="action_lazada_connector_config_settings"
                   sequence="1"/>
-
     </data>
 </odoo>

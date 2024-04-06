@@ -64,14 +64,14 @@ class ProductTemplate(models.Model):
                 self.is_manage_stock = False
 
 
-    @api.depends('lazada_image_ids')
+    @api.depends('woo_image_ids')
     def _compute_woo_image_kanban_ids(self):
         for r in self:
-            r.lazada_image_kanban_ids = r.lazada_image_ids.ids
+            r.woo_image_kanban_ids = r.woo_image_ids.ids
 
     def _inverse_woo_image_kanban_ids(self):
         for r in self:
-            r.lazada_image_ids = r.lazada_image_kanban_ids.ids
+            r.woo_image_ids = r.woo_image_kanban_ids.ids
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -79,8 +79,8 @@ class ProductTemplate(models.Model):
         for r in res:
             if not r.is_woo and not r.env.context.get('default_is_woo_product', False):
                 continue
-            r.lazada_image_kanban_ids.public_image()
-            r.lazada_image_ids.public_image()
+            r.woo_image_kanban_ids.public_image()
+            r.woo_image_ids.public_image()
             r.woo_sku = r.get_sku_woo()
             # r.add_locations()
         return res

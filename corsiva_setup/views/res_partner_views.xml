@@ -2,18 +2,18 @@
 <odoo>
     <data>
 
-        <record id="action_lazada_customer" model="ir.actions.act_window">
+        <record id="action_e_commerce_customer" model="ir.actions.act_window">
             <field name="name">Customer</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('is_lazada_partner', '=', True)]</field>
+<!--            <field name="domain">[('is_lazada_partner', '=', True)]</field>-->
         </record>
 
         <menuitem id="menu_lazada_customers"
                   name="Customers lazada"
                   parent="corsiva_connector.corsiva_customers_root"
-                  action="action_lazada_customer"
+                  action="action_e_commerce_customer"
                   sequence="15"/>
 
     </data>

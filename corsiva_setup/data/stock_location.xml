@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="lazada_stock_location" model="stock.location">
+            <field name="name">Lazada Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="shopee_stock_location" model="stock.location">
+            <field name="name">Shopee Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="woo_stock_location" model="stock.location">
+            <field name="name">WooCommerce Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="ecommerce_location" model="stock.location">
+            <field name="name">E-commerce Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="shopee_n_lazada_location" model="stock.location">
+            <field name="name">Shopee and Lazada Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="shopee_n_woo_location" model="stock.location">
+            <field name="name">Shopee and Woocommerce Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="woo_n_lazada_location" model="stock.location">
+            <field name="name">Woocommerce and Lazada Stock</field>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+    </data>
+</odoo>
