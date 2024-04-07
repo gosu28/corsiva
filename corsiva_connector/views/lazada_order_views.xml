@@ -11,15 +11,13 @@
                 <xpath expr="//field[@name='tax_totals']" position="before">
                     <field name="shipping_fee"  colspan="2" readonly="1"/>
                     <field name="discount"  colspan="2" readonly="1"/>
-<!--                    <field name="totals_value"  colspan="2" readonly="1"/>-->
                 </xpath>
-<!--                <xpath expr="//field[@name='tax_totals']" position="attributes">-->
-<!--                     <attribute name="invisible">1</attribute>-->
-<!--                </xpath>-->
                 <xpath expr="//field[@name='tax_id']" position="attributes">
                      <attribute name="invisible">1</attribute>
                 </xpath>
-<!--                                <field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2" readonly="1"/>-->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                     <field name="type_ecommerce"  widget="many2many_tags" readonly="1"/>
+                </xpath>
             </field>
         </record>
 
@@ -28,13 +26,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">sale.order</field>
             <field name="view_mode">tree,form</field>
-<!--            <field name="domain">[('is_lazada_order', '=', True)]</field>-->
         </record>
 
-<!--        <menuitem id="menu_lazada_orders"-->
-<!--                  name="Orders lazada"-->
-<!--                  parent="corsiva_connector.menu_corsiva_order"-->
-<!--                  action="action_lazada_orders"-->
-<!--                  sequence="10"/>-->
     </data>
 </odoo>

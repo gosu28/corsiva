@@ -40,6 +40,18 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
+                <xpath expr="//span[@class='d-inline-block']" position="after">
+                    <span class="d-inline-block">
+                            <field name="is_lazada_product"/>
+                            <label for="is_lazada_product"/>
+                    </span>
+                </xpath>
+
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field name="lazada_categ_id" attrs="{'invisible': [('is_lazada_product', '=', False)],
+                                                        'required': [('is_lazada_product', '=', True)]}"/>/>
+                </xpath>
+
                 <xpath expr="//div[@name='volume']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
@@ -73,6 +85,12 @@
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
 
+                <xpath expr="//button[@name='action_update_quantity_on_hand']" position="after">
+                    <field name="is_lazada_product" invisible="1"/>
+                    <field name="lazada_synced_ok" invisible="1"/>
+                    <button string="Push Lazada" type="object"  name="action_push_product_to_lazada"  attrs="{'invisible': ['|',('is_lazada_product','=',False),('lazada_synced_ok', '=', True)]}"/>
+                </xpath>
+
                 <xpath expr="//field[@name='categ_id']" position="attributes">
                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
                 </xpath>
@@ -82,7 +100,7 @@
                 </xpath>
 
                 <xpath expr="//page[last()]" position="after">
-                    <page name="product_images" string="Product Images Lazada">
+                    <page name="product_images" string="Product Images Lazada" attrs="{'invisible': [('is_lazada_product', '=', False)]}">
                         <div>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
@@ -109,11 +127,11 @@
 
             </field>
         </record>
-        <menuitem id="menu_lazada_products"
-                  name="Products Lazada"
-                  parent="corsiva_connector.menu_corsiva_products"
-                  action="action_lazada_products"
-                  sequence="20"/>
+<!--        <menuitem id="menu_lazada_products"-->
+<!--                  name="Products Lazada"-->
+<!--                  parent="corsiva_connector.menu_corsiva_products"-->
+<!--                  action="action_lazada_products"-->
+<!--                  sequence="20"/>-->
 
     </data>
 </odoo>

@@ -7,12 +7,12 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': [
-        'corsiva_connector',
+        # 'corsiva_connector',
         'corsiva_setup',
     ],
     'data': [
         'views/lazada_config_settings_views.xml',
-        'views/lazada_order_views.xml',
+        # 'views/lazada_order_views.xml',
         'views/lazada_product_views.xml',
         'views/lazada_attachment_views.xml',
         'views/lazada_product_category_views.xml',

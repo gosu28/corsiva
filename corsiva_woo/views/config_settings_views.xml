@@ -59,11 +59,11 @@
                   web_icon="corsiva_woo,static/description/icon.png"
                   sequence="100"/>
 
-        <menuitem id="menu_lazada_connector_setting"
-                  name="Settings Woo"
-                  parent="corsiva_connector.menu_corsiva_connector_configuration"
-                  action="action_woo_connector_config_settings"
-                  sequence="1"/>
+<!--        <menuitem id="menu_lazada_connector_setting"-->
+<!--                  name="Settings Woo"-->
+<!--                  parent="corsiva_connector.menu_corsiva_connector_configuration"-->
+<!--                  action="action_woo_connector_config_settings"-->
+<!--                  sequence="1"/>-->
 
     </data>
 </odoo>

@@ -7,15 +7,14 @@ import pytz
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    def _category_domain(self):
-        if self.env.context.get('default_is_woo_product', False):
-            return [('is_woo', '=', True)]
-        return [('is_woo', '=', False)]
+    def _category_domain_woo(self):
+        return [('is_woo', '=', True)]
 
     is_woo = fields.Boolean(string="Is Woo", default=False)
     url_product = fields.Char('URL Product Woo')
     woo_sku = fields.Char('SKU WOO', readonly=True)
     id_woo = fields.Char('id woo', readonly=True)
+    woo_synced_ok = fields.Boolean(String="Sync woo ok", readonly=True, default=False)
     woo_type = fields.Selection([
         ('simple', 'Simple Product'),
         ('grouped', 'Grouped Product'),
@@ -45,14 +44,13 @@ class ProductTemplate(models.Model):
         store=True
     )
 
-    categ_id = fields.Many2one(
+    woo_categ_id = fields.Many2one(
         'product.category',
-        'Product Category',
+        'Woo Category',
         change_default=True,
         default=False,
-        domain=_category_domain,
+        domain=_category_domain_woo,
         group_expand='_read_group_categ_id',
-        required=True
     )
 
     @api.depends('detailed_type')
@@ -62,7 +60,6 @@ class ProductTemplate(models.Model):
                 self.is_manage_stock = True
             else:
                 self.is_manage_stock = False
-
 
     @api.depends('woo_image_ids')
     def _compute_woo_image_kanban_ids(self):
@@ -77,7 +74,7 @@ class ProductTemplate(models.Model):
     def create(self, vals_list):
         res = super().create(vals_list)
         for r in res:
-            if not r.is_woo and not r.env.context.get('default_is_woo_product', False):
+            if not r.is_woo:
                 continue
             r.woo_image_kanban_ids.public_image()
             r.woo_image_ids.public_image()
@@ -92,7 +89,10 @@ class ProductTemplate(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if self.is_woo:
+        if "woo_image_kanban_ids" in vals or "woo_image_ids" in vals:
+            self.woo_image_kanban_ids.public_image()
+            self.woo_image_ids.public_image()
+        if self.is_woo and self.woo_synced_ok:
             self.action_push_product_to_shop(action="update")
 
     def get_sku_woo(self, timezone='Asia/Kolkata'):
@@ -109,6 +109,8 @@ class ProductTemplate(models.Model):
         for r in self:
             r.action_push_product_to_shop(action="create")
             r.is_woo = True
+            r.woo_synced_ok = True
+            r.add_type_ecommerce(name="WooEcommerce")
 
     def action_push_product_to_shop(self, action):
         connector = self.env['corsiva.woo'].open(connector_type='woo')
@@ -127,7 +129,7 @@ class ProductTemplate(models.Model):
     def get_categories_id(self):
         categories = []
         for res in self:
-            categories.append({"id": self.categ_id.woo_category_id})
+            categories.append({"id": self.woo_categ_id.woo_category_id})
             return categories
 
     def prepare_data_to_push_product(self):

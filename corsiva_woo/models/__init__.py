@@ -5,6 +5,8 @@ from . import ir_attachment
 from . import product_category
 from . import stock_location
 from . import stock_quant
+from . import res_partner
+from . import sale_order
 
 
 

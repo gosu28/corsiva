@@ -12,6 +12,9 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tag_ids']" position="after">
+                <field name="type_ecommerce" widget="many2many_tags" readonly="True"/>
+            </xpath>
             <xpath expr="//page[@name='general_information']/group[last()]" position="attributes">
                 <attribute name="style">display: none</attribute>
             </xpath>
@@ -26,19 +29,19 @@
         </field>
     </record>
 
-    <menuitem id="corsiva_menu_root"
-              name="Corsiva App"
-              sequence="100"/>
+<!--    <menuitem id="corsiva_menu_root"-->
+<!--              name="Corsiva App"-->
+<!--              sequence="100"/>-->
 
-    <menuitem id="menu_corsiva_products"
-              name="Products"
-              parent="corsiva_menu_root"
-              action="action_odoo_products"
-              sequence="1"/>
+<!--    <menuitem id="menu_corsiva_products"-->
+<!--              name="Products"-->
+<!--              parent="corsiva_menu_root"-->
+<!--              action="action_odoo_products"-->
+<!--              sequence="1"/>-->
 
-    <menuitem id="menu_odoo_products"
-              name="Products"
-              parent="menu_corsiva_products"
-              action="action_odoo_products"
-              sequence="1"/>
+<!--    <menuitem id="menu_odoo_products"-->
+<!--              name="Products"-->
+<!--              parent="menu_corsiva_products"-->
+<!--              action="action_odoo_products"-->
+<!--              sequence="1"/>-->
 </odoo>
