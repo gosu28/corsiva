@@ -19,6 +19,7 @@ class SaleOrder(models.Model):
         order = self.prepare_create_sale_order(data)
         order_id = self.env["sale.order"].create(order)
         order_id.order_line.tax_id = None
+        order_id.action_confirm()
         return order_id
 
     def prepare_create_sale_order(self, data):

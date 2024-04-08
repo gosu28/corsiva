@@ -32,8 +32,8 @@
 
                 <xpath expr="//span[@class='d-inline-block']" position="before">
                     <span class="d-inline-block">
-                            <field name="is_woo"/>
-                            <label for="is_woo"/>
+                            <field name="is_woo" />
+                            <label for="is_woo" />
                     </span>
                 </xpath>
 
