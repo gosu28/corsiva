@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_corsiva_lazada_corsiva_lazada,corsiva_lazada.corsiva_lazada,model_corsiva_lazada_corsiva_lazada,base.group_user,1,1,1,1

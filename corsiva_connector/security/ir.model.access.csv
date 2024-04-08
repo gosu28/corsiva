@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_corsiva_connector,access_corsiva_connector,model_corsiva_connector,,1,1,1,1
+access_corsiva_ecommerce,access_corsiva_ecommerce,model_corsiva_ecommerce,base.group_user,1,1,1,1

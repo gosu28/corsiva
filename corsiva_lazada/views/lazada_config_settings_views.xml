@@ -78,6 +78,25 @@
 
             </field>
         </record>
+        <record id="action_lazada_connector_config_settings" model="ir.actions.act_window">
+            <field name="name">Lazada Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_id" ref="base.res_config_settings_view_form"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'corsiva_lazada'}</field>
+        </record>
 
+        <menuitem id="lazada_connector_menu_root"
+                  name="Lazada"
+                  web_icon="corsiva_lazada,static/description/icon.png"
+                  sequence="100"/>
+
+<!--        <menuitem id="menu_lazada_connector_setting"-->
+<!--                  name="Settings Lazada"-->
+<!--                  parent="corsiva_connector.menu_corsiva_connector_configuration"-->
+<!--                  action="action_lazada_connector_config_settings"-->
+<!--                  sequence="1"/>-->
     </data>
 </odoo>

@@ -10,7 +10,7 @@
 <!--            <field name="domain">[('is_lazada_partner', '=', True)]</field>-->
         </record>
 
-        <menuitem id="menu_e_commerce_customers"
+        <menuitem id="menu_lazada_customers"
                   name="Customers"
                   parent="e_commerce_menu_root"
                   action="action_e_commerce_customer"

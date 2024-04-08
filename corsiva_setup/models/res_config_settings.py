@@ -8,9 +8,9 @@ class ResConfigSettings(models.TransientModel):
                                         selection=[
                                             ('shared_location', 'Shared Storage'),
                                             ('separate_location', 'Use a Separate Storage'),
-                                            ('shopee_n_lazada', 'Shopee & Lazada Utilize a Shared Storage'),
-                                            ('shopee_n_woo', 'Shopee & Woo Utilize a Shared Storage'),
-                                            ('woo_n_lazada', 'Lazada & Woo Utilize a Shared Storage'),
+                                            # ('shopee_n_lazada', 'Shopee & Lazada Utilize a Shared Storage'),
+                                            # ('shopee_n_woo', 'Shopee & Woo Utilize a Shared Storage'),
+                                            # ('woo_n_lazada', 'Lazada & Woo Utilize a Shared Storage'),
                                         ], default='shared_location')
     ecommerce_setup_location = fields.Boolean(string='Setup E-commerce Location')
     setup_once_time = fields.Boolean()

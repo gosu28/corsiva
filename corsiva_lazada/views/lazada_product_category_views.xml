@@ -15,6 +15,11 @@
 
             </field>
         </record>
+<!--        <menuitem id="menu_lazada_categories"-->
+<!--                  name="Lazada Product Categories"-->
+<!--                  parent="corsiva_connector.menu_corsiva_connector_configuration"-->
+<!--                  action="action_lazada_categories"-->
+<!--                  sequence="20"/>-->
 
     </data>
 </odoo>

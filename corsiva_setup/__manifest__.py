@@ -7,8 +7,7 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': [
-        'base',
-        'stock'
+        "corsiva_connector",
     ],
     'data': [
         'data/stock_location.xml',

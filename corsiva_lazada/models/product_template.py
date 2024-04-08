@@ -18,12 +18,10 @@ PRODUCT_FIELD_NEED_UPDATE = [
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    def _category_domain(self):
-        if self.env.context.get('default_is_lazada_product', False):
-            return [('is_leaf', '=', True)]
-        return [('is_lazada', '=', False)]
+    def _category_domain_lazada(self):
+        return [('is_lazada', '=', True)]
 
-    is_lazada_product = fields.Boolean()
+    is_lazada_product = fields.Boolean(String="Lazada product", default=False)
     lazada_image_ids = fields.Many2many(
         'ir.attachment',
         'product_template_ir_attachment_rel',
@@ -37,14 +35,13 @@ class ProductTemplate(models.Model):
         ondelete='cascade',
         store=True
     )
-    categ_id = fields.Many2one(
+    lazada_categ_id = fields.Many2one(
         'product.category',
-        'Product Category',
+        'Lazada Category',
         change_default=True,
         default=False,
-        domain=_category_domain,
+        domain=_category_domain_lazada,
         group_expand='_read_group_categ_id',
-        required=True
     )
     lazada_synced_ok = fields.Boolean(
         string='Synced to Lazada'
@@ -91,23 +88,30 @@ class ProductTemplate(models.Model):
             r.action_push_product_to_shop(action='create')
         return res
 
+    def action_push_product_to_lazada(self):
+        for r in self:
+            if not r.is_lazada_product:
+                continue
+            r.action_push_product_to_shop(action='create')
+
     def write(self, vals):
         res = super().write(vals)
-        if self.env.context.get('loop', False):
-            return res
+        if self.is_lazada_product:
+            if self.env.context.get('loop', False):
+                return res
 
-        for r in self:
-            if not r.is_lazada_product or not r.sku_id:
-                continue
-            for field in PRODUCT_FIELD_NEED_UPDATE:
-                if field not in vals.keys():
+            for r in self:
+                if not r.is_lazada_product or not r.sku_id:
                     continue
+                for field in PRODUCT_FIELD_NEED_UPDATE:
+                    if field not in vals.keys():
+                        continue
 
-                if field == 'list_price':
-                    r.action_update_price()
-                else:
-                    r.action_push_product_to_shop(action='update')
-                break
+                    if field == 'list_price':
+                        r.action_update_price()
+                    else:
+                        r.action_push_product_to_shop(action='update')
+                    break
         return res
 
     def action_push_product_to_shop(self, action):
@@ -153,7 +157,7 @@ class ProductTemplate(models.Model):
         data = {
             "Request": {
                 "Product": {
-                    "PrimaryCategory": self.categ_id.lazada_category_id,
+                    "PrimaryCategory": self.lazada_categ_id.lazada_category_id,
                     "Images": {
                         "Image": [data['image']['url'] for data in img_datas]
                     },

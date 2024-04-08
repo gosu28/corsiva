@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_odoo_products" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('is_woo', '=', True)]</field>
+            <field name="context">{'default_is_woo_product': True}</field>
+    </record>
+
+     <record id="woo_product_template_inherit_form_view" model="ir.ui.view">
+        <field name="name">product_template_inherit_form_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <field name="detailed_type" position="after">
+                <field name="woo_type" attrs="{'invisible': [('is_woo','=',False)]}"/>
+                <field name="woo_status" attrs="{'invisible': [('is_woo','=',False)]}"/>
+                <field name="is_manage_stock" attrs="{'invisible': [('is_woo','=',False)]}"/>
+                <field name="is_woo" invisible="1" />
+                <field name="url_product" readonly="True" attrs="{'invisible': [('is_woo', '=', False)]}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="woo_product_template_inherit_only_form_view" model="ir.ui.view">
+            <field name="name">product.template.inherit.only.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//span[@class='d-inline-block']" position="before">
+                    <span class="d-inline-block">
+                            <field name="is_woo" />
+                            <label for="is_woo" />
+                    </span>
+                </xpath>
+
+                <xpath expr="//button[@name='action_update_quantity_on_hand']" position="after">
+                    <field name="is_woo" invisible="1"/>
+                    <button string="Push Woo" type="object"  name="action_create_product_woo"  attrs="{'invisible': ['|',('is_woo','=',False),('woo_synced_ok', '=', True)]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='categ_id']" position="attributes">
+                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field name="woo_synced_ok" invisible="True"/>
+                    <field name="woo_categ_id" attrs="{'invisible': [('is_woo','=',False)]}" options="{'no_create': True, 'no_open': True}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='default_code']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('product_variant_count', '&gt;', 1)], 'required': 1}</attribute>
+                </xpath>
+
+                <xpath expr="//page[last()]" position="after">
+                    <page name="product_images" string="Product Images Woo" attrs="{'invisible': [('is_woo','=',False)]}">
+                        <div>
+                            <field name="woo_image_ids" widget="many2many_binary" nolabel="1" class="woo_img"/>
+                            <field name="woo_image_kanban_ids" mode="kanban" nolabel="1" class="woo_kanban_img"/>
+                        </div>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+<!--    <menuitem id="menu_woo_products"-->
+<!--              name="Products Woo"-->
+<!--              parent="corsiva_connector.menu_corsiva_products"-->
+<!--              action="action_odoo_products"-->
+<!--              sequence="10"/>-->
+</odoo>

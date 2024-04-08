@@ -6,8 +6,21 @@
     'website': "https://www.yourcompany.com",
     'category': 'Uncategorized',
     'version': '16.0.0.0',
-    'depends': ['base'],
-    'data': [],
+    'depends': [
+            'base',
+            'sale_stock',
+            'stock',
+            'contacts',
+            'sale_management',
+                ],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/corsiva_product_view.xml',
+        'views/lazada_order_views.xml',
+        'views/corsiva_partner_view.xml',
+        'views/corsiva_order_view.xml',
+        'views/configuration.xml',
+    ],
     'demo': [],
     'application': True
 }
