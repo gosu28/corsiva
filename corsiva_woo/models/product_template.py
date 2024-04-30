@@ -78,7 +78,7 @@ class ProductTemplate(models.Model):
                 continue
             r.woo_image_kanban_ids.public_image()
             r.woo_image_ids.public_image()
-            r.woo_sku = r.get_sku_woo()
+            # r.woo_sku = r.get_sku_woo()
             # r.add_locations()
         return res
 
@@ -142,7 +142,7 @@ class ProductTemplate(models.Model):
             "categories": self.get_categories_id(),
             "images": self.get_images_url() or [],
             "status": self.woo_status or "",
-            "sku": self.woo_sku or "",
+            "sku": self.default_code,
             "weight": str(self.weight_amount) or "",
             "manage_stock": self.is_manage_stock,
             "dimensions": {
