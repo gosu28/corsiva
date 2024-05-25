@@ -10,28 +10,49 @@
 
                 <xpath expr="//div[hasclass('settings')]" position="inside">
                     <div class="app_settings_block" data-string="corsiva_shopee" string="Shopee" data-key="corsiva_shopee">
-                        <h2>Configuration</h2>
+                        <h2>Shopee Configuration</h2>
                         <div class="row mt16 o_settings_container" name="shopee_connector_setting">
-                            <div class="o_setting_right_pane">
-                                <span class="o_form_label">Store</span>
-                                <div class="text-muted">
-                                    Default taxes applied to local transactions
-                                </div>
-                                <div class="content-group">
+                            <div class="o_setting_box col-12 col-lg-12">
+                                <div class="o_setting_right_pane">
                                     <div class="row mt16">
-                                        <label class="o_form_label col-1 o_light_label" for="url">Store URL
-                                        </label>
-                                        <field name="url"/>
+                                        <label class="o_form_label col-4 o_light_label" for="partner_id"/>
+                                        <field name="partner_id"/>
                                     </div>
                                     <div class="row mt16">
-                                        <label class="o_form_label col-1 o_light_label" for="username">Username
-                                        </label>
-                                        <field name="username"/>
+                                        <label class="o_form_label col-4 o_light_label" for="partner_key"/>
+                                        <field name="partner_key"/>
                                     </div>
                                     <div class="row mt16">
-                                        <label class="o_form_label col-1 o_light_label" for="password">Password
-                                        </label>
-                                        <field name="password" password="True"/>
+                                        <label class="o_form_label col-4 o_light_label" for="redirect_url"/>
+                                        <field name="redirect_url"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label class="o_form_label col-4 o_light_label" for="authen_url"/>
+                                        <field name="authen_url"/>
+                                    </div>
+                                    <div class="mt-5">
+                                        <field name="shopee_synced_product_category" invisible="1"/>
+                                        <button name='action_shopee_synchronize_product_category'
+                                                icon="fa-arrow-right"
+                                                type="object"
+                                                string="Synchronize Product Categories"
+                                                class="btn-link"
+                                                attrs="{'invisible': [('shopee_synced_product_category', '!=', False)]}"
+                                                confirm="This will synchronize all category of shopee?"
+                                        />
+                                        <span attrs="{'invisible': [('shopee_synced_product_category', '=', False)]}">
+                                            <i class="fa fa-fw fa-check" role="img" style="color: #1e9f75"/>
+                                            <span class="d-none d-md-inline" style="color:gray"> Product Categories Synced</span>
+                                        </span>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <div class="col-3">
+                                            <button name="action_shopee_authorize"
+                                                    type="object"
+                                                    string="Authorization"
+                                                    class="oe_highlight"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -41,7 +62,6 @@
 
             </field>
         </record>
-
         <record id="action_shopee_connector_config_settings" model="ir.actions.act_window">
             <field name="name">Shopee Settings</field>
             <field name="type">ir.actions.act_window</field>
@@ -55,18 +75,6 @@
         <menuitem id="shopee_connector_menu_root"
                   name="Shopee"
                   web_icon="corsiva_shopee,static/description/icon.png"
-                  sequence="100"/>
-
-        <menuitem id="menu_shopee_connector_configuration"
-                  name="Configuration"
-                  parent="shopee_connector_menu_root"
-                  sequence="100"/>
-
-        <menuitem id="menu_shopee_connector_setting"
-                  name="Settings"
-                  parent="menu_shopee_connector_configuration"
-                  action="action_shopee_connector_config_settings"
-                  sequence="100"/>
-
+                  sequence="99"/>
     </data>
 </odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="shopee_product_category_inherit_tree_view" model="ir.ui.view">
+            <field name="name">shopee_product_category_inherit_tree_view</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_list_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='display_name']" position="after">
+                    <field name="shopee_category"/>
+                    <field name="shopee_cate_id"/>
+                    <field name="shopee_leaf_cate"/>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -15,9 +15,9 @@
     ],
     'data': [
         'views/shopee_config_settings_views.xml',
-        'views/shopee_order_views.xml',
-        'views/shopee_partner_views.xml',
-        'views/shopee_product_views.xml',
+        'views/shopee_product_category_views.xml',
+        # 'views/shopee_partner_views.xml',
+        # 'views/shopee_product_views.xml',
     ],
     'demo': [],
     'application': True

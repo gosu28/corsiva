@@ -1,21 +1,15 @@
-# -*- coding: utf-8 -*-
-# from odoo import http
+from odoo import http
+from odoo.http import request
 
 
-# class CorsivaShopee(http.Controller):
-#     @http.route('/corsiva_shopee/corsiva_shopee', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
-
-#     @http.route('/corsiva_shopee/corsiva_shopee/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('corsiva_shopee.listing', {
-#             'root': '/corsiva_shopee/corsiva_shopee',
-#             'objects': http.request.env['corsiva_shopee.corsiva_shopee'].search([]),
-#         })
-
-#     @http.route('/corsiva_shopee/corsiva_shopee/objects/<model("corsiva_shopee.corsiva_shopee"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('corsiva_shopee.object', {
-#             'object': obj
-#         })
+class ShopeeControllers(http.Controller):
+    @http.route('/shopee_auth', type='http', auth="none")
+    def index(self, **kw):
+        shop_id = kw.get('shop_id')
+        code = kw.get('code')
+        if shop_id and code:
+            config_param = request.env['ir.config_parameter'].sudo()
+            config_param.set_param('shopee_shop_id', shop_id)
+            config_param.set_param('shopee_code', code)
+            request.env['shopee.connector'].get_access_token()
+        return request.redirect('/web')

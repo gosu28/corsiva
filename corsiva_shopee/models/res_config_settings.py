@@ -1,12 +1,20 @@
+import hmac
+import json
+import time
+import requests
+import hashlib
+
 from odoo import models, fields, api, _
 
 
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
-    url = fields.Char()
-    username = fields.Char()
-    password = fields.Char()
+    partner_id = fields.Char()
+    partner_key = fields.Char()
+    redirect_url = fields.Char()
+    authen_url = fields.Char()
+    shopee_synced_product_category = fields.Boolean()
 
     @api.model
     def get_values(self):
@@ -14,9 +22,10 @@ class ResConfigSettings(models.TransientModel):
 
         param = self.env['ir.config_parameter'].sudo()
         res.update(
-            url=param.get_param('shopee_url'),
-            username=param.get_param('shopee_username'),
-            password=param.get_param('shopee_password')
+            partner_id=param.get_param('shopee_partner_id'),
+            partner_key=param.get_param('shopee_partner_key'),
+            redirect_url=param.get_param('shopee_redirect_url'),
+            authen_url=param.get_param('shopee_authen_url'),
         )
 
         return res
@@ -26,10 +35,67 @@ class ResConfigSettings(models.TransientModel):
 
         param = self.env['ir.config_parameter'].sudo()
 
-        field_url = self.url if self.url else False
-        field_username = self.username if self.username else False
-        field_password = self.password if self.password else False
+        field_partner_id = self.partner_id if self.partner_id else False
+        field_partner_key = self.partner_key if self.partner_key else False
+        field_redirect_url = self.redirect_url if self.redirect_url else False
+        field_authen_url = self.authen_url if self.authen_url else False
 
-        param.set_param('shopee_url', field_url)
-        param.set_param('shopee_username', field_username)
-        param.set_param('shopee_password', field_password)
+        param.set_param('shopee_partner_id', field_partner_id)
+        param.set_param('shopee_partner_key', field_partner_key)
+        param.set_param('shopee_redirect_url', field_redirect_url)
+        param.set_param('shopee_authen_url', field_authen_url)
+
+    def get_sign(self, key, redirect_url):
+        combined_string = key + redirect_url
+        return hashlib.sha256(combined_string.encode()).hexdigest()
+
+    # def action_shopee_authorize(self):
+    #     key = self.partner_key
+    #     redirect_url = self.redirect_url
+    #
+    #     token = self.get_sign(key, redirect_url)
+    #     data = {
+    #         'id': self.partner_id,
+    #         'token': token,
+    #         'redirect': self.redirect_url
+    #     }
+    #
+    #     authorization_redirect_url = self.authen_url + "?" + "&".join([f"{key}={value}" for key, value in data.items()])
+    #
+    #     print(authorization_redirect_url)
+    #     return {
+    #         'type': 'ir.actions.act_url',
+    #         'target': 'self',
+    #         'url': authorization_redirect_url
+    #     }
+
+    def action_shopee_authorize(self):
+        timest = int(time.time())
+        host = "https://partner.test-stable.shopeemobile.com"
+        path = "/api/v2/shop/auth_partner"
+        redirect_url = self.redirect_url
+        partner_id = self.partner_id
+        partner_key = self.partner_key.encode()
+        tmp_base_string = "%s%s%s" % (partner_id, path, timest)
+        base_string = tmp_base_string.encode('utf_8')
+        sign = hmac.new(partner_key, base_string, hashlib.sha256).hexdigest()
+        ##generate api
+        url = host + path + "?partner_id=%s&timestamp=%s&sign=%s&redirect=%s" % (int(partner_id), timest, sign, redirect_url)
+        print(url)
+
+        return {
+                'type': 'ir.actions.act_url',
+                'target': 'self',
+                'url': url
+            }
+
+    def action_shopee_synchronize_product_category(self):
+        category_data = self.env['shopee.connector'].call()
+
+        # self.shopee_synced_product_category = True
+        # self.env['ir.config_parameter'].sudo().set_param('shopee_synced_product_category', self.shopee_synced_product_category)
+        return self.env['product.category'].create_shopee_categories(category_data['response']['category_list'])
+
+        # connector = self.env['corsiva.connector'].open(connector_type='lazada')
+        # category_data = connector.get_categories(action='get_categories')
+        # return self.env['product.category'].create_correspond_categories(category_data['data'])
