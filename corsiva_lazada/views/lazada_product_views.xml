@@ -47,10 +47,10 @@
                     </span>
                 </xpath>
 
-                <xpath expr="//field[@name='categ_id']" position="after">
-                    <field name="lazada_categ_id" attrs="{'invisible': [('is_lazada_product', '=', False)],
-                                                        'required': [('is_lazada_product', '=', True)]}"/>/>
-                </xpath>
+<!--                <xpath expr="//field[@name='categ_id']" position="after">-->
+<!--                    <field name="lazada_categ_id" attrs="{'invisible': [('is_lazada_product', '=', False)],-->
+<!--                                                        'required': [('is_lazada_product', '=', True)]}"/>/>-->
+<!--                </xpath>-->
 
                 <xpath expr="//div[@name='volume']" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -92,7 +92,8 @@
                 </xpath>
 
                 <xpath expr="//field[@name='categ_id']" position="attributes">
-                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+<!--                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>-->
+                    <attribute name="invisible">1</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='default_code']" position="attributes">
@@ -100,15 +101,14 @@
                 </xpath>
 
                 <xpath expr="//page[last()]" position="after">
-                    <page name="product_images" string="Product Images Lazada" attrs="{'invisible': [('is_lazada_product', '=', False)]}">
-                        <div>
+                    <page name="lazada_pages" string="Lazada">
+                        <group>
+                            <field name="categ_id" options="{'no_create': True, 'no_open': True}" string="Lazada Category"/>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
-                            <field name="item_id" invisible="1"/>
+                            <field name="item_id" invisible="0" string="Lazada ID" readonly="1"/>
                             <field name="is_lazada_product" invisible="1"/>
-                            <field name="lazada_image_ids" widget="many2many_binary" nolabel="1" class="lazada_img"/>
-                            <field name="lazada_image_kanban_ids" mode="kanban" nolabel="1" class="lazada_kanban_img"/>
-                        </div>
+                        </group>
                     </page>
                 </xpath>
 
