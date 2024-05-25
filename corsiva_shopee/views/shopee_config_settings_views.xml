@@ -31,16 +31,16 @@
                                         <field name="authen_url"/>
                                     </div>
                                     <div class="mt-5">
-                                        <field name="shopee_synced_product_category" invisible="1"/>
-                                        <button name='action_shopee_synchronize_product_category'
+                                        <field name="shopee_synced_master_data" invisible="1"/>
+                                        <button name='action_shopee_synchronize_master_data'
                                                 icon="fa-arrow-right"
                                                 type="object"
-                                                string="Synchronize Product Categories"
+                                                string="Synchronize Master Data"
                                                 class="btn-link"
-                                                attrs="{'invisible': [('shopee_synced_product_category', '!=', False)]}"
-                                                confirm="This will synchronize all category of shopee?"
+                                                attrs="{'invisible': [('shopee_synced_master_data', '!=', False)]}"
+                                                confirm="This will synchronize all master data of shopee?"
                                         />
-                                        <span attrs="{'invisible': [('shopee_synced_product_category', '=', False)]}">
+                                        <span attrs="{'invisible': [('shopee_synced_master_data', '=', False)]}">
                                             <i class="fa fa-fw fa-check" role="img" style="color: #1e9f75"/>
                                             <span class="d-none d-md-inline" style="color:gray"> Product Categories Synced</span>
                                         </span>

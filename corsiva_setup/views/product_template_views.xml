@@ -36,6 +36,15 @@
                     </group>
                 </xpath>
 
+                <xpath expr="//page[last()]" position="after">
+                    <page name="product_images" string="Product Images">
+                        <div class="corsiva_images">
+                            <field name="image_ids" widget="many2many_binary" nolabel="1" class="corsiva_img"/>
+                            <field name="image_kanban_ids" mode="kanban" nolabel="1" class="corsiva_kanban_img"/>
+                        </div>
+                    </page>
+                </xpath>
+
             </field>
         </record>
 

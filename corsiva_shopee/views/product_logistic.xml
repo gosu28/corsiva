@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="corsiva_product_logistic_action" model="ir.actions.act_window">
+            <field name="name">corsiva_product_logistic_action</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.logistic</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_product_logistic"
+                  name="Logistic"
+                  parent="corsiva_setup.menu_e_commerce_configuration"
+                  action="corsiva_product_logistic_action"
+                  sequence="30"/>
+
+    </data>
+</odoo>

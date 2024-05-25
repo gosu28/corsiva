@@ -14,7 +14,7 @@ class ResConfigSettings(models.TransientModel):
     partner_key = fields.Char()
     redirect_url = fields.Char()
     authen_url = fields.Char()
-    shopee_synced_product_category = fields.Boolean()
+    shopee_synced_master_data = fields.Boolean()
 
     @api.model
     def get_values(self):
@@ -89,13 +89,18 @@ class ResConfigSettings(models.TransientModel):
                 'url': url
             }
 
-    def action_shopee_synchronize_product_category(self):
-        category_data = self.env['shopee.connector'].call()
+    def action_shopee_synchronize_master_data(self):
+        connector = self.env['shopee.connector']
+        config = self.env['ir.config_parameter'].sudo()
 
-        # self.shopee_synced_product_category = True
-        # self.env['ir.config_parameter'].sudo().set_param('shopee_synced_product_category', self.shopee_synced_product_category)
-        return self.env['product.category'].create_shopee_categories(category_data['response']['category_list'])
+        # category_data = connector.get_category()
+        # if category_data:
+        #     self.env['product.category'].create_shopee_categories(category_data['response']['category_list'])
 
-        # connector = self.env['corsiva.connector'].open(connector_type='lazada')
-        # category_data = connector.get_categories(action='get_categories')
-        # return self.env['product.category'].create_correspond_categories(category_data['data'])
+        channel_data = connector.get_channel()
+        if channel_data:
+            self.env['product.logistic'].create_shopee_channel(channel_data['response']['logistics_channel_list'])
+
+        # self.shopee_synced_master_data = True
+        # config.set_param('shopee_synced_master_data', self.shopee_synced_master_data)
+        return True

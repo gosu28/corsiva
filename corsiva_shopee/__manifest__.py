@@ -14,10 +14,12 @@
         'contacts'
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/shopee_config_settings_views.xml',
         'views/shopee_product_category_views.xml',
         # 'views/shopee_partner_views.xml',
-        # 'views/shopee_product_views.xml',
+        'views/shopee_product_views.xml',
+        'views/product_logistic.xml',
     ],
     'demo': [],
     'application': True

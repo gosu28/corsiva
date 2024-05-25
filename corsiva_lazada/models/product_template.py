@@ -11,7 +11,7 @@ PRODUCT_FIELD_NEED_UPDATE = [
     'default_code',
     'description',
     'name',
-    'lazada_image_ids'
+    'image_ids'
 ]
 
 
@@ -22,19 +22,6 @@ class ProductTemplate(models.Model):
         return [('is_lazada', '=', True)]
 
     is_lazada_product = fields.Boolean(String="Lazada product", default=False)
-    lazada_image_ids = fields.Many2many(
-        'ir.attachment',
-        'product_template_ir_attachment_rel',
-        string='Upload Images'
-    )
-    lazada_image_kanban_ids = fields.Many2many(
-        'ir.attachment',
-        'product_template_kanban_ir_attachment_rel',
-        compute='_compute_lazada_image_kanban_ids',
-        inverse='_inverse_lazada_image_kanban_ids',
-        ondelete='cascade',
-        store=True
-    )
     lazada_categ_id = fields.Many2one(
         'product.category',
         'Lazada Category',
@@ -59,16 +46,7 @@ class ProductTemplate(models.Model):
     sku_id = fields.Char()
     item_id = fields.Char()
 
-    @api.depends('lazada_image_ids')
-    def _compute_lazada_image_kanban_ids(self):
-        for r in self:
-            r.lazada_image_kanban_ids = r.lazada_image_ids.ids
-
-    def _inverse_lazada_image_kanban_ids(self):
-        for r in self:
-            r.lazada_image_ids = r.lazada_image_kanban_ids.ids
-
-    @api.constrains('weight_amount', 'height_amount', 'length_amount', 'width_amount', 'lazada_image_ids')
+    @api.constrains('weight_amount', 'height_amount', 'length_amount', 'width_amount', 'image_ids')
     def _constrains_product_dimensions(self):
         for r in self:
             if not r.is_lazada_product:
@@ -76,7 +54,7 @@ class ProductTemplate(models.Model):
 
             if r.weight_amount == 0 or r.height_amount == 0 or r.length_amount == 0 or r.width_amount == 0:
                 raise ValidationError('Error: You need to set size specifications for this products!')
-            if not r.lazada_image_ids:
+            if not r.image_ids:
                 raise ValidationError('Error: You need to set image for this products!')
 
     @api.model_create_multi
@@ -141,7 +119,7 @@ class ProductTemplate(models.Model):
 
     def create_images(self, connector):
         img_datas = []
-        for r in self.lazada_image_ids:
+        for r in self.image_ids:
             img_prepare_data = self._prepare_data_to_create_images(r)
             img_data = connector.create_images(action='create_images', data=img_prepare_data)
             img_datas.append(img_data['data'])
