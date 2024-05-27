@@ -16,6 +16,7 @@ get_channel = '/api/v2/logistics/get_channel_list'
 post_image = '/api/v2/media_space/upload_image'
 post_product = '/api/v2/product/add_item'
 update_product = '/api/v2/product/update_item'
+update_stock = '/api/v2/product/update_stock'
 
 
 class ShopeeConnectorAPI(models.TransientModel):
@@ -103,6 +104,14 @@ class ShopeeConnectorAPI(models.TransientModel):
         access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_data()
         sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_product, timestamp, access_token, shop_id), tmp_partner_key)
         url = f"{url}{update_product}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
+        payload = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
+        return self.call(url, headers=headers, payload=payload, method='POST')
+
+    def update_stock(self, data):
+        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_data()
+        sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_stock, timestamp, access_token, shop_id), tmp_partner_key)
+        url = f"{url}{update_stock}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
         payload = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         return self.call(url, headers=headers, payload=payload, method='POST')
