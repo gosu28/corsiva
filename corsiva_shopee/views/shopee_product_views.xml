@@ -23,11 +23,25 @@
                 <xpath expr="//page[last()]" position="after">
                     <page name="shopee_pages" string="Shopee">
                         <group>
-                            <field name="shopee_category_id" options="{'no_create': True, 'no_open': True}" domain="[('shopee_leaf_cate', '=', True)]"/>
-                            <field name="logistic_id" options="{'no_create': True, 'no_open': True}"/>
-                            <field name="shopee_item_id" invisible="0" string="Shopee ID" readonly="1"/>
-                            <field name="shopee_synced_ok" invisible="1"/>
+                            <group>
+                                <field name="shopee_category_id" options="{'no_create': True, 'no_open': True}"
+                                       domain="[('shopee_leaf_cate', '=', True)]"/>
+                            </group>
+                            <group>
+                                <field name="shopee_item_id" invisible="0" string="Shopee ID" readonly="1"/>
+                                <field name="shopee_synced_ok" invisible="1"/>
+                            </group>
                         </group>
+                        <div>
+                            <label for="logistic_ids"/>
+                            <field name="logistic_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="logistic_id" options="{'no_create': True, 'no_open': True}" force_save="1"/>
+                                    <field name="is_free" force_save="1"/>
+                                    <field name="logistic_line_id" domain="[('line_id', '=', logistic_id)]" force_save="1" string="Size"/>
+                                </tree>
+                            </field>
+                        </div>
                     </page>
                 </xpath>
 

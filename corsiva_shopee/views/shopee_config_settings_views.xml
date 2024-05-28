@@ -42,7 +42,7 @@
                                         />
                                         <span attrs="{'invisible': [('shopee_synced_master_data', '=', False)]}">
                                             <i class="fa fa-fw fa-check" role="img" style="color: #1e9f75"/>
-                                            <span class="d-none d-md-inline" style="color:gray"> Product Categories Synced</span>
+                                            <span class="d-none d-md-inline" style="color:gray"> Master Data Synced</span>
                                         </span>
                                     </div>
                                     <div class="row mt-5">

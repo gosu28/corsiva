@@ -11,12 +11,14 @@ from odoo.exceptions import ValidationError
 SUCCESS = [200, 201]
 
 get_access_token = '/api/v2/auth/token/get'
+refresh_access_token = '/api/v2/auth/access_token/get'
 get_category = '/api/v2/product/get_category'
 get_channel = '/api/v2/logistics/get_channel_list'
 post_image = '/api/v2/media_space/upload_image'
 post_product = '/api/v2/product/add_item'
 update_product = '/api/v2/product/update_item'
 update_stock = '/api/v2/product/update_stock'
+update_price = '/api/v2/product/update_price'
 
 
 class ShopeeConnectorAPI(models.TransientModel):
@@ -35,6 +37,23 @@ class ShopeeConnectorAPI(models.TransientModel):
 
         url = f"{url}{get_access_token}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
         body = {"code": code, "shop_id": shop_id, "partner_id": partner_id}
+        headers = {"Content-Type": "application/json"}
+
+        resp = requests.post(url, json=body, headers=headers)
+        ret = json.loads(resp.content)
+
+        config_param = self.env['ir.config_parameter'].sudo()
+        config_param.set_param('shopee_access_token', ret.get("access_token"))
+        config_param.set_param('shopee_refresh_token', ret.get("refresh_token"))
+        return True
+
+    def refresh_token(self):
+        refresh_token = self.env['ir.config_parameter'].sudo().get_param('shopee_refresh_token')
+        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_data()
+        sign = self.get_sign("%s%s%s" % (partner_id, refresh_access_token, timestamp), tmp_partner_key)
+
+        url = f"{url}{refresh_access_token}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
+        body = {"refresh_token": refresh_token, "shop_id": shop_id, "partner_id": partner_id}
         headers = {"Content-Type": "application/json"}
 
         resp = requests.post(url, json=body, headers=headers)
@@ -75,6 +94,8 @@ class ShopeeConnectorAPI(models.TransientModel):
         if response.status_code not in SUCCESS:
             raise ValidationError(json.loads(response.text)['message'])
         if response.status_code in SUCCESS:
+            if json.loads(response.text).get('debug_message') not in ('', False):
+                raise ValidationError(json.loads(response.text).get('debug_message'))
             if json.loads(response.text).get('message') not in ('', False):
                 raise ValidationError(json.loads(response.text).get('message'))
 
@@ -112,6 +133,14 @@ class ShopeeConnectorAPI(models.TransientModel):
         access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_data()
         sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_stock, timestamp, access_token, shop_id), tmp_partner_key)
         url = f"{url}{update_stock}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
+        payload = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
+        return self.call(url, headers=headers, payload=payload, method='POST')
+
+    def update_price(self, data):
+        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_data()
+        sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_price, timestamp, access_token, shop_id), tmp_partner_key)
+        url = f"{url}{update_price}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
         payload = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         return self.call(url, headers=headers, payload=payload, method='POST')

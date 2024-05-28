@@ -12,15 +12,24 @@ FIELDS = [
     'default_code',
     'list_price',
     'weight_amount',
-    'logistic_id',
+    'logistic_ids'
 ]
+
+
+class ProductLogisticInfo(models.Model):
+    _name = 'product.logistic.info'
+
+    logistic_id = fields.Many2one('product.logistic')
+    logistic_line_id = fields.Many2one('product.logistic.line')
+    is_free = fields.Boolean()
+    product_id = fields.Many2one('product.template')
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     shopee_category_id = fields.Many2one('product.category')
-    logistic_id = fields.Many2one('product.logistic')
+    logistic_ids = fields.One2many('product.logistic.info', 'product_id', 'Shopee Logistic')
     shopee_item_id = fields.Char()
     is_shopee_product = fields.Boolean()
     shopee_synced_ok = fields.Boolean()
@@ -32,6 +41,12 @@ class ProductTemplate(models.Model):
         res = super().write(vals)
         if self.env.context.get('loop', False):
             return res
+
+        if 'list_price' in vals.keys():
+            for r in self:
+                if not r.shopee_synced_ok:
+                    continue
+                r.action_update_shopee_price(price=vals['list_price'])
 
         for field in FIELDS:
             if field not in vals.keys():
@@ -62,7 +77,18 @@ class ProductTemplate(models.Model):
         connector.update_products(self._prepare_data_to_post_product(img_datas))
         return True
 
+    def action_update_shopee_price(self, price):
+        data = {
+            "item_id": int(self.shopee_item_id),
+            "price_list": [{
+                "original_price": price
+            }]
+        }
+        connector = self.env['shopee.connector']
+        connector.update_price(data)
+
     def _prepare_data_to_post_product(self, img_datas):
+        logistic_info = self.get_logistic_info()
         data = {
             "brand": {
                 "brand_id": 0
@@ -77,14 +103,7 @@ class ProductTemplate(models.Model):
             },
             "item_name": self.name,
             "item_sku": self.default_code,
-            "logistic_info": [
-                {
-                    "enabled": True,
-                    "is_free": True,
-                    "logistic_id": int(self.logistic_id.shopee_logistic_id),
-                    "size_id": 1
-                }
-            ],
+            "logistic_info": logistic_info,
             "original_price": self.list_price,
             "seller_stock": [{"stock": 0}],
             "weight": self.weight_amount
@@ -94,6 +113,23 @@ class ProductTemplate(models.Model):
         if self.shopee_item_id:
             data.update(item_id=int(self.shopee_item_id))
         return data
+
+    def get_logistic_info(self):
+        res = []
+        for record in self.env['product.logistic'].search([]):
+            enabled = False
+            line_id = False
+            if self.logistic_ids.mapped('logistic_id').filtered(lambda l: l.id == record.id):
+                line_id = self.logistic_ids.filtered(lambda l: l.logistic_id.id == record.id)
+                enabled = True
+
+            res.append({
+                "enabled": enabled,
+                "logistic_id": int(record.shopee_logistic_id),
+                "size_id": int(line_id.logistic_line_id.size_id) if enabled else 1,
+                "is_free": line_id.is_free if line_id else False
+            })
+        return res
 
     def action_upload_images(self):
         connector = self.env['shopee.connector']
@@ -105,3 +141,7 @@ class ProductTemplate(models.Model):
             img_data = connector.post_images(data=img_prepare_data)
             img_datas.append(img_data['response']['image_info']['image_id'])
         return img_datas
+
+    def _refresh_token(self):
+        connector = self.env['shopee.connector']
+        connector.refresh_token()

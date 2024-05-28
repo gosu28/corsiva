@@ -14,6 +14,7 @@
         'contacts'
     ],
     'data': [
+        'data/ir_cron.xml',
         'security/ir.model.access.csv',
         'views/shopee_config_settings_views.xml',
         'views/shopee_product_category_views.xml',

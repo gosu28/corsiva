@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_product_logistic,access_product_logistic,model_product_logistic,base.group_user,1,1,1,1
+access_product_logistic_line,access_product_logistic_line,model_product_logistic_line,base.group_user,1,1,1,1
+access_product_logistic_info,access_product_logistic_info,model_product_logistic_info,base.group_user,1,1,1,1
