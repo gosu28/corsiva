@@ -51,24 +51,20 @@ class ResConfigSettings(models.TransientModel):
         return hashlib.sha256(combined_string.encode()).hexdigest()
 
     def action_shopee_authorize(self):
-        timest = int(time.time())
-        host = "https://partner.test-stable.shopeemobile.com"
+        timestamp = int(time.time())
         path = "/api/v2/shop/auth_partner"
-        redirect_url = self.redirect_url
-        partner_id = self.partner_id
+        partner_id = int(self.partner_id)
         partner_key = self.partner_key.encode()
-        tmp_base_string = "%s%s%s" % (partner_id, path, timest)
+        tmp_base_string = "%s%s%s" % (partner_id, path, timestamp)
         base_string = tmp_base_string.encode('utf_8')
-        sign = hmac.new(partner_key, base_string, hashlib.sha256).hexdigest()
-        ##generate api
-        url = host + path + "?partner_id=%s&timestamp=%s&sign=%s&redirect=%s" % (int(partner_id), timest, sign, redirect_url)
-        print(url)
 
+        sign = hmac.new(partner_key, base_string, hashlib.sha256).hexdigest()
+        url = f"{self.authen_url}{path}?partner_id={partner_id}&timestamp={timestamp}&sign={sign}&redirect={self.redirect_url}"
         return {
-                'type': 'ir.actions.act_url',
-                'target': 'self',
-                'url': url
-            }
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': url
+        }
 
     def action_shopee_synchronize_master_data(self):
         connector = self.env['shopee.connector']
