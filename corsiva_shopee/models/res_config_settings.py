@@ -26,6 +26,7 @@ class ResConfigSettings(models.TransientModel):
             partner_key=param.get_param('shopee_partner_key'),
             redirect_url=param.get_param('shopee_redirect_url'),
             authen_url=param.get_param('shopee_authen_url'),
+            shopee_synced_master_data=param.get_param('shopee_synced_master_data'),
         )
 
         return res
@@ -48,26 +49,6 @@ class ResConfigSettings(models.TransientModel):
     def get_sign(self, key, redirect_url):
         combined_string = key + redirect_url
         return hashlib.sha256(combined_string.encode()).hexdigest()
-
-    # def action_shopee_authorize(self):
-    #     key = self.partner_key
-    #     redirect_url = self.redirect_url
-    #
-    #     token = self.get_sign(key, redirect_url)
-    #     data = {
-    #         'id': self.partner_id,
-    #         'token': token,
-    #         'redirect': self.redirect_url
-    #     }
-    #
-    #     authorization_redirect_url = self.authen_url + "?" + "&".join([f"{key}={value}" for key, value in data.items()])
-    #
-    #     print(authorization_redirect_url)
-    #     return {
-    #         'type': 'ir.actions.act_url',
-    #         'target': 'self',
-    #         'url': authorization_redirect_url
-    #     }
 
     def action_shopee_authorize(self):
         timest = int(time.time())
@@ -93,14 +74,14 @@ class ResConfigSettings(models.TransientModel):
         connector = self.env['shopee.connector']
         config = self.env['ir.config_parameter'].sudo()
 
-        # category_data = connector.get_category()
-        # if category_data:
-        #     self.env['product.category'].create_shopee_categories(category_data['response']['category_list'])
+        category_data = connector.get_category()
+        if category_data:
+            self.env['product.category'].create_shopee_categories(category_data['response']['category_list'])
 
         channel_data = connector.get_channel()
         if channel_data:
             self.env['product.logistic'].create_shopee_channel(channel_data['response']['logistics_channel_list'])
 
-        # self.shopee_synced_master_data = True
-        # config.set_param('shopee_synced_master_data', self.shopee_synced_master_data)
+        self.shopee_synced_master_data = True
+        config.set_param('shopee_synced_master_data', self.shopee_synced_master_data)
         return True

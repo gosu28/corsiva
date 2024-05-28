@@ -7,7 +7,7 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': [
-        # 'corsiva_connector',
+        'corsiva_connector',
         'corsiva_setup',
     ],
     'data': [
