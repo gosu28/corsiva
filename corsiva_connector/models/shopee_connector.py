@@ -39,108 +39,75 @@ class ShopeeConnectorAPI(models.TransientModel):
         shop_id = int(self.env['ir.config_parameter'].sudo().get_param('shopee_shop_id'))
         return access_token, url, timestamp, partner_id, tmp_partner_key, shop_id
 
-    def get_access_token(self):
-        code = self.env['ir.config_parameter'].sudo().get_param('shopee_code')
+    def action_get_token(self, key, body):
         access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s" % (partner_id, get_access_token, timestamp), tmp_partner_key)
+        sign = self.get_sign("%s%s%s" % (partner_id, key, timestamp), tmp_partner_key)
 
-        url = f"{url}{get_access_token}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
-        body = {"code": code, "shop_id": shop_id, "partner_id": partner_id}
+        url = f"{url}{key}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
         headers = {"Content-Type": "application/json"}
+        body.update(shop_id=shop_id, partner_id=partner_id)
 
-        resp = requests.post(url, json=body, headers=headers)
-        ret = json.loads(resp.content)
+        response = requests.post(url, json=body, headers=headers)
+        result = json.loads(response.content)
 
         config_param = self.env['ir.config_parameter'].sudo()
-        config_param.set_param('shopee_access_token', ret.get("access_token"))
-        config_param.set_param('shopee_refresh_token', ret.get("refresh_token"))
+        config_param.set_param('shopee_access_token', result.get("access_token"))
+        config_param.set_param('shopee_refresh_token', result.get("refresh_token"))
         return True
+
+    def call(self, key, headers, payload, method, upload_file=False):
+        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
+        sign = self.get_sign("%s%s%s%s%s" % (partner_id, key, timestamp, access_token, shop_id), tmp_partner_key)
+        url = f"{url}{key}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
+
+        if upload_file:
+            response = requests.request("POST", url, headers={}, files=payload)
+        else:
+            response = requests.request(method, url, headers=headers, data=payload)
+
+        if response.status_code not in SUCCESS:
+            raise ValidationError(json.loads(response.text)['message'])
+
+        if response.status_code in SUCCESS:
+            if json.loads(response.text).get('message') not in ('', False):
+                raise ValidationError(json.loads(response.text).get('message'))
+
+        return json.loads(response.text)
+
+    def action_get(self, key):
+        return self.call(key, headers={}, payload={}, method='GET')
+
+    def action_post(self, payload, key, upload_file=False):
+        headers = {'Content-Type': 'application/json'}
+        if not upload_file:
+            payload = json.dumps(payload)
+        return self.call(key, headers=headers, payload=payload, method='POST', upload_file=upload_file)
+
+    def get_access_token(self):
+        code = self.env['ir.config_parameter'].sudo().get_param('shopee_code')
+        return self.action_get_token(get_access_token, body={"code": code})
 
     def refresh_token(self):
         refresh_token = self.env['ir.config_parameter'].sudo().get_param('shopee_refresh_token')
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s" % (partner_id, refresh_access_token, timestamp), tmp_partner_key)
-
-        url = f"{url}{refresh_access_token}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
-        body = {"refresh_token": refresh_token, "shop_id": shop_id, "partner_id": partner_id}
-        headers = {"Content-Type": "application/json"}
-
-        resp = requests.post(url, json=body, headers=headers)
-        ret = json.loads(resp.content)
-
-        config_param = self.env['ir.config_parameter'].sudo()
-        config_param.set_param('shopee_access_token', ret.get("access_token"))
-        config_param.set_param('shopee_refresh_token', ret.get("refresh_token"))
-        return True
-
-    def post_images(self, data):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s" % (partner_id, post_image, timestamp), tmp_partner_key)
-        url = f"{url}{post_image}?partner_id={partner_id}&sign={sign}&timestamp={timestamp}"
-        response = requests.request("POST", url, headers={}, files=data)
-
-        if response.status_code not in SUCCESS:
-            raise ValidationError(json.loads(response.text)['message'])
-        if response.status_code in SUCCESS:
-            if json.loads(response.text).get('message') not in ('', False):
-                raise ValidationError(json.loads(response.text).get('message'))
-
-        return json.loads(response.text)
-
-    @staticmethod
-    def call(url, headers, payload, method):
-        response = requests.request(method, url, headers=headers, data=payload)
-
-        if response.status_code not in SUCCESS:
-            raise ValidationError(json.loads(response.text)['message'])
-        if response.status_code in SUCCESS:
-            if json.loads(response.text).get('debug_message') not in ('', False):
-                raise ValidationError(json.loads(response.text).get('debug_message'))
-            if json.loads(response.text).get('message') not in ('', False):
-                raise ValidationError(json.loads(response.text).get('message'))
-
-        return json.loads(response.text)
+        return self.action_get_token(refresh_access_token, body={"refresh_token": refresh_token})
 
     def get_category(self):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, get_category, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{get_category}?access_token={access_token}&language=zh-hans&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        return self.call(url, headers={}, payload={}, method='GET')
+        return self.action_get(key=get_category)
 
     def get_channel(self):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, get_channel, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{get_channel}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        return self.call(url, headers={}, payload={}, method='GET')
+        return self.action_get(key=get_channel)
 
     def post_products(self, data):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, post_product, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{post_product}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        payload = json.dumps(data)
-        headers = {'Content-Type': 'application/json'}
-        return self.call(url, headers=headers, payload=payload, method='POST')
+        return self.action_post(payload=data, key=post_product)
+
+    def post_images(self, data):
+        return self.action_post(payload=data, key=post_image, upload_file=True)
 
     def update_products(self, data):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_product, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{update_product}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        payload = json.dumps(data)
-        headers = {'Content-Type': 'application/json'}
-        return self.call(url, headers=headers, payload=payload, method='POST')
+        return self.action_post(payload=data, key=update_product)
 
     def update_stock(self, data):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_stock, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{update_stock}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        payload = json.dumps(data)
-        headers = {'Content-Type': 'application/json'}
-        return self.call(url, headers=headers, payload=payload, method='POST')
+        return self.action_post(payload=data, key=update_stock)
 
     def update_price(self, data):
-        access_token, url, timestamp, partner_id, tmp_partner_key, shop_id = self.get_shopee_config()
-        sign = self.get_sign("%s%s%s%s%s" % (partner_id, update_price, timestamp, access_token, shop_id), tmp_partner_key)
-        url = f"{url}{update_price}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
-        payload = json.dumps(data)
-        headers = {'Content-Type': 'application/json'}
-        return self.call(url, headers=headers, payload=payload, method='POST')
+        return self.action_post(payload=data, key=update_price)
