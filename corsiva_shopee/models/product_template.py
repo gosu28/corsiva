@@ -28,11 +28,11 @@ class ProductLogisticInfo(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    shopee_category_id = fields.Many2one('product.category')
-    logistic_ids = fields.One2many('product.logistic.info', 'product_id', 'Shopee Logistic')
-    shopee_item_id = fields.Char()
-    is_shopee_product = fields.Boolean()
-    shopee_synced_ok = fields.Boolean()
+    shopee_category_id = fields.Many2one('product.category', copy=False)
+    logistic_ids = fields.One2many('product.logistic.info', 'product_id', 'Shopee Logistic', copy=False)
+    shopee_item_id = fields.Char(copy=False)
+    is_shopee_product = fields.Boolean(copy=False)
+    shopee_synced_ok = fields.Boolean(copy=False)
 
     def action_push_product_to_shopee(self):
         return self.action_upload_product()
@@ -120,7 +120,7 @@ class ProductTemplate(models.Model):
             enabled = False
             line_id = False
             if self.logistic_ids.mapped('logistic_id').filtered(lambda l: l.id == record.id):
-                line_id = self.logistic_ids.filtered(lambda l: l.logistic_id.id == record.id)
+                line_id = self.logistic_ids.filtered(lambda l: l.logistic_id.id == record.id)[0]
                 enabled = True
 
             res.append({
