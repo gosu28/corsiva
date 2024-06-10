@@ -5,6 +5,7 @@ import json
 import time
 import hashlib
 import hmac
+import urllib.parse
 
 from odoo.exceptions import ValidationError
 
@@ -19,6 +20,7 @@ post_product = '/api/v2/product/add_item'
 update_product = '/api/v2/product/update_item'
 update_stock = '/api/v2/product/update_stock'
 update_price = '/api/v2/product/update_price'
+get_order_details = '/api/v2/order/get_order_detail'
 
 
 class ShopeeConnectorAPI(models.TransientModel):
@@ -60,6 +62,11 @@ class ShopeeConnectorAPI(models.TransientModel):
         sign = self.get_sign("%s%s%s%s%s" % (partner_id, key, timestamp, access_token, shop_id), tmp_partner_key)
         url = f"{url}{key}?access_token={access_token}&partner_id={partner_id}&shop_id={shop_id}&sign={sign}&timestamp={timestamp}"
 
+        if method == 'GET' and payload:
+            query_str = "&" + urllib.parse.urlencode(payload)
+            url = f"{url}{query_str}"
+            payload = {}
+
         if upload_file:
             response = requests.request("POST", url, headers={}, files=payload)
         else:
@@ -74,8 +81,8 @@ class ShopeeConnectorAPI(models.TransientModel):
 
         return json.loads(response.text)
 
-    def action_get(self, key):
-        return self.call(key, headers={}, payload={}, method='GET')
+    def action_get(self, key, payload={}):
+        return self.call(key, headers={}, payload=payload, method='GET')
 
     def action_post(self, payload, key, upload_file=False):
         headers = {'Content-Type': 'application/json'}
@@ -96,6 +103,9 @@ class ShopeeConnectorAPI(models.TransientModel):
 
     def get_channel(self):
         return self.action_get(key=get_channel)
+
+    def get_order_details(self, data):
+        return self.action_get(key=get_order_details, payload=data)
 
     def post_products(self, data):
         return self.action_post(payload=data, key=post_product)
