@@ -5,6 +5,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     is_shopee_order = fields.Boolean()
+    shopee_order_sn = fields.Char()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -15,23 +16,31 @@ class SaleOrder(models.Model):
 
     def create_shopee_order(self, data):
         if data.get('code') == 3:
+            existed_order_id = self.env['sale.order'].search([('shopee_order_sn', '=', data['data']['ordersn'])])
+            if existed_order_id:
+                return True
+
             connector = self.env['shopee.connector']
-            # if data['data']['status'] == 'PROCESSED':
             payload = {
                 'order_sn_list': data['data']['ordersn'],
-                'request_order_status_pending': True,
-                'response_optional_fields': 'total_amount'
+                'response_optional_fields': 'total_amount,buyer_username,item_list,model_quantity_purchased'
             }
 
             order_data = connector.get_order_details(data=payload)
-            vals = self._prepare_vals_to_create_order(order_data)
-            self.create(vals)
+            if 'response' in order_data.keys():
+                if 'order_list' in order_data['response'].keys():
+                    if order_data['response']['order_list']:
+                        val_api = order_data['response']['order_list'][0]
+                        vals = self._prepare_vals_to_create_order(val_api)
+                        self.create(vals)
+            return True
 
     def _prepare_vals_to_create_order(self, order_data):
         partner_id = self.get_partner(order_data)
         order_line = self.get_order_line_data(order_data)
         vals = {
-            'partner_id': partner_id,
+            'shopee_order_sn': order_data['order_sn'],
+            'partner_id': partner_id.id,
             'order_line': order_line
         }
         return vals
@@ -41,11 +50,7 @@ class SaleOrder(models.Model):
         if existed_partner_id:
             return existed_partner_id
 
-        vals = {
-            # 'buyer_user_id': data['buyer_user_id'],
-            'name': data['buyer_username'],
-        }
-        return self.env['res.partner'].create(vals)
+        return self.env['res.partner'].create({'name': data['buyer_username']})
 
     def get_order_line_data(self, data):
         vals = []
@@ -56,7 +61,8 @@ class SaleOrder(models.Model):
                     continue
                 vals.append((0, 0, {
                     'product_id': product_id,
-                    'model_original_price': item['model_original_price'],
+                    'product_uom_qty': item.get('model_quantity_purchased', 1),
+                    'price_unit': item['model_original_price'],
                 }))
         return vals
 
