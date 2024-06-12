@@ -7,6 +7,7 @@
     'category': 'Uncategorized',
     'version': '16.0.0.0',
     'depends': [
+        'sale'
     ],
     'data': [
         'security/ir.model.access.csv',
