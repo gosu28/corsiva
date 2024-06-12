@@ -4,3 +4,4 @@ from . import product_template
 from . import product_logistic
 from . import stock_quant
 from . import sale_order
+from . import stock_rule
