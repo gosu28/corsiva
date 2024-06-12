@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_login_app_tree" model="ir.ui.view">
+            <field name="name">login.app.tree</field>
+            <field name="model">login.app</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="login"/>
+                    <field name="active_on"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_login_app_form" model="ir.ui.view">
+            <field name="name">login.app.form</field>
+            <field name="model">login.app</field>
+            <field name="arch" type="xml">
+                <form string="Login App">
+                    <group>
+                        <field name="login"/>
+                        <field name="password"/>
+                        <field name="active_on" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_login_app" model="ir.actions.act_window">
+            <field name="name">Login App</field>
+            <field name="res_model">login.app</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem
+                action="action_login_app"
+                id="menu_action_login_app"
+                parent="base.menu_users"
+                sequence="99"/>
+    </data>
+</odoo>
