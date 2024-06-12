@@ -9,5 +9,5 @@ class StockRule(models.Model):
         if origin:
             so_id = self.env['sale.order'].search([('name', '=', origin)], limit=1)
             if so_id and so_id.is_shopee_order:
-                res['location_dest_id'] = int(self.env['ir.config_parameter'].sudo().get_param('shopee_stock'))
+                res['location_id'] = int(self.env['ir.config_parameter'].sudo().get_param('shopee_stock'))
         return res

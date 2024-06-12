@@ -4,9 +4,9 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    is_shopee_order = fields.Boolean()
-    shopee_order_sn = fields.Char(string='Shopee Order ID')
-    shopee_order_status = fields.Char()
+    is_shopee_order = fields.Boolean(copy=False)
+    shopee_order_sn = fields.Char(string='Shopee Order ID', copy=False)
+    shopee_order_status = fields.Char(copy=False)
 
     def create_shopee_order(self, data):
         if data.get('code') == 3:
@@ -19,7 +19,8 @@ class SaleOrder(models.Model):
         connector = self.env['shopee.connector']
         payload = {
             'order_sn_list': data['data']['ordersn'],
-            'response_optional_fields': 'total_amount,buyer_username,item_list,actual_shipping_fee'
+            'request_order_status_pending': True,
+            'response_optional_fields': 'buyer_username,item_list,actual_shipping_fee,estimated_shipping_fee'
         }
 
         order_data = connector.get_order_details(data=payload)
@@ -29,21 +30,25 @@ class SaleOrder(models.Model):
         if order_data['response']['order_list']:
             val_api = order_data['response']['order_list'][0]
             vals = self._prepare_vals_to_create_order(val_api)
-            self.create(vals)
+            if vals:
+                self.create(vals)
 
     def _prepare_vals_to_create_order(self, order_data):
         partner_id = self.get_partner(order_data)
         order_line, discount_price = self.get_order_line_data(order_data)
-        vals = {
+
+        if not order_line:
+            return {}
+
+        return {
             'is_shopee_order': True,
-            'shipping_fee': order_data.get('actual_shipping_fee', 0),
+            'shipping_fee': order_data.get('estimated_shipping_fee', 0),
             'discount': discount_price,
             'shopee_order_status': order_data['order_status'],
             'shopee_order_sn': order_data['order_sn'],
             'partner_id': partner_id.id,
             'order_line': order_line
         }
-        return vals
 
     def get_partner(self, data):
         existed_partner_id = self.env['res.partner'].search([('name', '=', data['buyer_username'])])
@@ -71,7 +76,9 @@ class SaleOrder(models.Model):
         return vals, discount_price
 
     def get_product(self, item_id):
-        product_id = self.env['product.template'].search([('shopee_item_id', '=', item_id)])
+        product_id = self.env['product.template'].search([('shopee_item_id', '=', item_id)], limit=1)
+        print(item_id)
+        print(product_id)
         if product_id:
             return product_id.id
         return False
