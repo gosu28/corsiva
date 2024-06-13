@@ -6,6 +6,8 @@ class LoginApp(models.Model):
 
     login = fields.Char(string='Login', required=True)
     password = fields.Char(string='Password', required=True)
+    name = fields.Char(string='Name', required=True)
+    phone = fields.Char(string='Phone', required=True)
     active_on = fields.Boolean(string='Active', default=False)
 
     def get_data(self):

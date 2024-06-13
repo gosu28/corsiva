@@ -114,3 +114,61 @@ class OdooApi(http.Controller):
             }
         return result
 
+    @http.route('/get-list-product', type='json', auth='public', csrf=False, methods=['GET'])
+    def get_list_product(self, **kw):
+        try:
+            result = request.httprequest.data
+            data = json.loads(result)
+            product_list = []
+            product_ids = request.env['product.template'].sudo().search([])
+            url_base = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            for product_id in product_ids:
+                product_dict = {
+                    'name': product_id.name,
+                    'code': product_id.default_code,
+                    'price': product_id.list_price,
+                    'image': '{0}/web/image/product.template/{1}/image_1920'.format(url_base, product_id.id),
+                    'quantity': product_id.qty_available,
+                }
+                product_list.append(product_dict)
+
+            result = {
+                'data': product_list,
+                'status': 200,
+                'msg': 'Load data Successful',
+            }
+        except AccessError as e:
+            result = {
+                'data': [],
+                'status': 400,
+                'msg': 'Load data Fail',
+            }
+        return result
+
+    @http.route('/get-detail-user', type='json', auth='public', csrf=False, methods=['POST'])
+    def get_detail_user(self, **kw):
+        try:
+            result = request.httprequest.data
+            data = json.loads(result)
+            login = data.get('login')
+            password = data.get('password')
+            login = request.env['login.app'].sudo().search([('login', '=', login),
+                                                            ('password', '=', password)], limit=1)
+
+            result = {
+                'data': {
+                    'name': login.name,
+                    'phone': login.phone
+                },
+                'status': 200,
+                'msg': 'Load data Successful',
+            }
+        except Exception as e:
+            result = {
+                'data': {},
+                'status': 400,
+                'msg': 'Load data Fail',
+            }
+        return result
+
+
