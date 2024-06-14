@@ -5,12 +5,12 @@ from odoo.exceptions import AccessError
 
 
 class OdooApi(http.Controller):
-    @http.route('/login-app', type='http', auth='public', csrf=False, methods=['POST'])
-    def login_app(self, **kw):
-        result = request.httprequest.data
-        data = json.loads(result)
-        login = data.get('login')
-        password = data.get('password')
+    @http.route('/login-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    def login_app(self, login, password,  **kw):
+        # result = request.httprequest.data
+        # data = json.loads(result)
+        # login = data.get('login')
+        # password = data.get('password')
         login = request.env['login.app'].sudo().search([('login', '=', login),
                                                         ('password', '=', password)], limit=1)
         if login:
@@ -23,12 +23,12 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/logout-app', type='http', auth='public', csrf=False, methods=['POST'])
-    def logout_app(self, **kw):
-        result = request.httprequest.data
-        data = json.loads(result)
-        login = data.get('login')
-        password = data.get('password')
+    @http.route('/logout-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    def logout_app(self, login, password, **kw):
+        # result = request.httprequest.data
+        # data = json.loads(result)
+        # login = data.get('login')
+        # password = data.get('password')
 
         login = request.env['login.app'].sudo().search([('login', '=', login),
                                                         ('password', '=', password)], limit=1)
@@ -75,13 +75,13 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-detail-order', type='http', auth='public', csrf=False, methods=['POST'])
-    def get_detail_order(self, **kw):
+    @http.route('/get-detail-order', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    def get_detail_order(self, login, password, name, **kw):
         try:
-            result = request.httprequest.data
-            data = json.loads(result)
-            so_name = data.get('name')
-            order = request.env['sale.order'].sudo().search([('name', '=', so_name)], limit=1)
+            # result = request.httprequest.data
+            # data = json.loads(result)
+            # so_name = data.get('name')
+            order = request.env['sale.order'].sudo().search([('name', '=', name)], limit=1)
             order_dict = {
                 'name': order.name,
                 'customer': order.partner_id.name,
@@ -114,7 +114,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-list-product', type='http', auth='public', csrf=False, methods=['GET'])
+    @http.route('/get-list-product', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
     def get_list_product(self, **kw):
         try:
             result = request.httprequest.data
@@ -145,13 +145,13 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-detail-user', type='http', auth='public', csrf=False, methods=['POST'])
-    def get_detail_user(self, **kw):
+    @http.route('/get-detail-user', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    def get_detail_user(self, login, password, **kw):
         try:
-            result = request.httprequest.data
-            data = json.loads(result)
-            login = data.get('login')
-            password = data.get('password')
+            # result = request.httprequest.data
+            # data = json.loads(result)
+            # login = data.get('login')
+            # password = data.get('password')
             login = request.env['login.app'].sudo().search([('login', '=', login),
                                                             ('password', '=', password)], limit=1)
 
