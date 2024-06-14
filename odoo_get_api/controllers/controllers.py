@@ -5,7 +5,7 @@ from odoo.exceptions import AccessError
 
 
 class OdooApi(http.Controller):
-    @http.route('/login-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    @http.route('/login-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'], cors="*")
     def login_app(self, login, password,  **kw):
         # result = request.httprequest.data
         # data = json.loads(result)
@@ -23,7 +23,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/logout-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    @http.route('/logout-app', type='http', auth='public', csrf=False, methods=['GET', 'POST'], cors="*")
     def logout_app(self, login, password, **kw):
         # result = request.httprequest.data
         # data = json.loads(result)
@@ -47,7 +47,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-list-order', type='http', auth='public', csrf=False, methods=['GET'])
+    @http.route('/get-list-order', type='http', auth='public', csrf=False, methods=['GET'], cors="*")
     def list_order(self, **kw):
         try:
             order = request.env['sale.order'].sudo().search([])
@@ -75,7 +75,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-detail-order', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    @http.route('/get-detail-order', type='http', auth='public', csrf=False, methods=['GET', 'POST'], cors="*")
     def get_detail_order(self, login, password, name, **kw):
         try:
             # result = request.httprequest.data
@@ -114,7 +114,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-list-product', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    @http.route('/get-list-product', type='http', auth='public', csrf=False, methods=['GET', 'POST'], cors="*")
     def get_list_product(self, **kw):
         try:
             result = request.httprequest.data
@@ -145,7 +145,7 @@ class OdooApi(http.Controller):
             }
         return http.Response(json.dumps(result), headers={'Content-Type': 'application/json'})
 
-    @http.route('/get-detail-user', type='http', auth='public', csrf=False, methods=['GET', 'POST'])
+    @http.route('/get-detail-user', type='http', auth='public', csrf=False, methods=['GET', 'POST'], cors="*")
     def get_detail_user(self, login, password, **kw):
         try:
             # result = request.httprequest.data
