@@ -82,17 +82,17 @@ class ProductTemplate(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
-        for r in res:
-            if not r.is_lazada_product:
-                continue
-            r.action_push_product_to_shop(action='create')
+        # for r in res:
+        #     if not r.is_lazada_product:
+        #         continue
+        #     r.action_push_product_to_shop(action='create')
         return res
 
     def action_push_product_to_lazada(self):
         for r in self:
             if not r.is_lazada_product:
                 continue
-            r.action_push_product_to_shop(action='create')
+            r.action_push_product_to_shop_lazada(action='create')
 
     def write(self, vals):
         res = super().write(vals)
@@ -110,17 +110,17 @@ class ProductTemplate(models.Model):
                     if field == 'list_price':
                         r.action_update_price()
                     else:
-                        r.action_push_product_to_shop(action='update')
+                        r.action_push_product_to_shop_lazada(action='update')
                     break
         return res
 
-    def action_push_product_to_shop(self, action):
-        if not self.env['ir.config_parameter'].sudo().get_param('ecommerce_setup_location', False):
+    def action_push_product_to_shop_lazada(self, action):
+        if not self.env['ir.config_parameter'].sudo().get_param('lazada_stock', False):
             raise ValidationError('You need to set up warehouses for the E-commerce platforms beforehand !')
 
         connector = self.env['corsiva.connector'].open(connector_type='lazada')
         image_datas = self.create_images(connector)
-        products_prepare_data = self.prepare_data_to_push_product(action, image_datas)
+        products_prepare_data = self.prepare_data_to_push_product_lazada(action, image_datas)
         if action == 'create':
             response_data = connector.create_products(action='create_products', data=products_prepare_data)['data']
             self.with_context(loop=True).write({
@@ -153,7 +153,7 @@ class ProductTemplate(models.Model):
             'image': attachment_id.raw
         }
 
-    def prepare_data_to_push_product(self, action, img_datas):
+    def prepare_data_to_push_product_lazada(self, action, img_datas):
         data = {
             "Request": {
                 "Product": {
