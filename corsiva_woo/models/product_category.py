@@ -11,7 +11,7 @@ class ProductCategory(models.Model):
     woo_parent_id = fields.Char(string='Woo Parent ID')
     description = fields.Text(string='Description')
 
-    def flatten_tree_data(self, data, level=0):
+    def flatten_tree_data_woo(self, data, level=0):
         flattened_data = []
 
         for item in data:
@@ -26,7 +26,7 @@ class ProductCategory(models.Model):
             flattened_data.append(flattened_item)
         return flattened_data
 
-    def create_categories(self, datas, parent_id=False):
+    def create_categories_woo(self, datas, parent_id=False):
         values = []
         for data in datas:
             if not data['name']:
@@ -54,9 +54,9 @@ class ProductCategory(models.Model):
 
                 parent_n.parent_id = parent_n1.id
 
-    def create_correspond_categories(self, data):
-        grouped_data = self.flatten_tree_data(data)
-        self.create_categories(grouped_data)
+    def create_correspond_categories_woo(self, data):
+        grouped_data = self.flatten_tree_data_woo(data)
+        self.create_categories_woo(grouped_data)
         self.add_parent_category(grouped_data)
         return True
 
