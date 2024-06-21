@@ -20,6 +20,7 @@
         'views/shopee_product_category_views.xml',
         # 'views/shopee_partner_views.xml',
         'views/shopee_product_views.xml',
+        'views/shopee_order_views.xml',
         'views/product_logistic.xml',
     ],
     'demo': [],
