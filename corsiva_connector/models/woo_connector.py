@@ -92,7 +92,7 @@ class WooConnection(models.TransientModel):
             if len(results) == 0:
                 break
             try:
-                self.env['product.category'].create_correspond_categories(data=results)
+                self.env['product.category'].create_correspond_categories_woo(data=results)
             except Exception as e:
                 raise ValidationError(str(e))
             steps = steps + 1
