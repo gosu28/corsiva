@@ -155,7 +155,7 @@ class ProductTemplate(models.Model):
 
     def get_images_url(self):
         images = []
-        for res in self.lazada_image_ids:
+        for res in self.woo_image_ids:
             img_url = "/web/image/ir.attachment/{0}/raw/{1}".format(res.id, res.name)
             url_base = self.env['ir.config_parameter'].get_param('web.base.url')
             url_product = url_base + img_url
