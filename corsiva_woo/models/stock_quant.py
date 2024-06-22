@@ -9,10 +9,10 @@ class StockQuant(models.Model):
         if self.product_id.is_manage_stock and self.location_id == location_id:
             # and self.location_id == location_id:
             connector = self.env['corsiva.woo'].open(connector_type='woo')
-            data = self._prepare_data_to_update_quantity()
+            data = self._prepare_data_to_update_quantity_woo()
             connector.woo_update_product(data=data, id_woo=self.product_id.id_woo)
 
-    def _prepare_data_to_update_quantity(self):
+    def _prepare_data_to_update_quantity_woo(self):
         if self.quantity == 0:
             stock_status = "outofstock"
         elif self.quantity > 0:
