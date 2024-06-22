@@ -103,7 +103,7 @@
                 <xpath expr="//page[last()]" position="after">
                     <page name="lazada_pages" string="Lazada">
                         <group>
-                            <field name="categ_id" options="{'no_create': True, 'no_open': True}" string="Lazada Category"/>
+                            <field name="lazada_categ_id" options="{'no_create': True, 'no_open': True}" string="Lazada Category"/>
                             <field name="shop_sku" invisible="1"/>
                             <field name="sku_id" invisible="1"/>
                             <field name="item_id" invisible="0" string="Lazada ID" readonly="1"/>
