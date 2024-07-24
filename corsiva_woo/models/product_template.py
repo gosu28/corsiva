@@ -89,11 +89,12 @@ class ProductTemplate(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if "woo_image_kanban_ids" in vals or "woo_image_ids" in vals:
-            self.woo_image_kanban_ids.public_image()
-            self.woo_image_ids.public_image()
-        if self.is_woo and self.woo_synced_ok:
-            self.action_push_product_to_shop(action="update")
+        for rec in self:
+            if "woo_image_kanban_ids" in vals or "woo_image_ids" in vals:
+                rec.woo_image_kanban_ids.public_image()
+                rec.woo_image_ids.public_image()
+            if rec.is_woo and rec.woo_synced_ok:
+                rec.action_push_product_to_shop(action="update")
 
     def get_sku_woo(self, timezone='Asia/Kolkata'):
         for res in self:

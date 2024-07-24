@@ -74,22 +74,23 @@ class ProductTemplate(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if self.is_lazada_product:
-            if self.env.context.get('loop', False):
-                return res
+        for rec in self:
+            if rec.is_lazada_product:
+                if rec.env.context.get('loop', False):
+                    return res
 
-            for r in self:
-                if not r.is_lazada_product or not r.sku_id:
-                    continue
-                for field in PRODUCT_FIELD_NEED_UPDATE:
-                    if field not in vals.keys():
+                for r in rec:
+                    if not r.is_lazada_product or not r.sku_id:
                         continue
+                    for field in PRODUCT_FIELD_NEED_UPDATE:
+                        if field not in vals.keys():
+                            continue
 
-                    if field == 'list_price':
-                        r.action_update_price()
-                    else:
-                        r.action_push_product_to_shop_lazada(action='update')
-                    break
+                        if field == 'list_price':
+                            r.action_update_price()
+                        else:
+                            r.action_push_product_to_shop_lazada(action='update')
+                        break
         return res
 
     def action_push_product_to_shop_lazada(self, action):
